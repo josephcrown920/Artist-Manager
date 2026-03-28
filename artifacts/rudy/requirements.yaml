@@ -1,0 +1,9 @@
+packages:
+  "framer-motion": "For fluid chat bubble animations and transitions"
+  "date-fns": "For formatting message timestamps"
+  "lucide-react": "For UI icons like gear, send, etc."
+  "clsx": "For class merging utility"
+  "tailwind-merge": "For class merging utility"
+
+notes:
+  - Expects @workspace/api-client-react to expose useGetChatHistory, useSendMessage, useClearChatHistory hooks.

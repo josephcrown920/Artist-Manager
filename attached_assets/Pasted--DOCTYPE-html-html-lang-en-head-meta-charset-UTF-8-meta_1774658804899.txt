@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rudy - Your Panda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .chat-bubble-ai { background: linear-gradient(135deg, #f59e0b, #ec4899); }
+  </style>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen">
+  <div class="max-w-xl mx-auto h-screen flex flex-col">
+    <!-- Header -->
+    <div class="bg-zinc-900 border-b border-orange-500 p-4 flex items-center gap-3">
+      <div class="w-10 h-10 bg-orange-500 rounded-2xl flex items-center justify-center text-3xl">🦊</div>
+      <div>
+        <h1 class="text-xl font-bold">Rudy</h1>
+        <p class="text-orange-400 text-sm">Your permanent hybrid companion</p>
+      </div>
+      <button onclick="showSettings()" class="ml-auto text-orange-400">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </div>
+
+    <!-- Chat -->
+    <div id="chat" class="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-950"></div>
+
+    <!-- Input -->
+    <div class="p-4 border-t border-zinc-800 bg-zinc-900">
+      <div class="flex gap-2">
+        <input id="input" type="text" class="flex-1 bg-zinc-800 rounded-3xl px-6 py-4 focus:outline-none text-white" placeholder="Talk to Rudy...">
+        <button onclick="sendMessage()" class="bg-orange-500 hover:bg-orange-600 w-12 h-12 rounded-2xl flex items-center justify-center">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center">
+    <div class="bg-zinc-900 rounded-3xl p-6 w-full max-w-md mx-4">
+      <h2 class="text-2xl font-bold mb-4">Settings</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm mb-1">xAI API Key</label>
+          <input id="apiKeyInput" type="password" class="w-full bg-zinc-800 rounded-2xl px-4 py-3">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Model (default works great)</label>
+          <input id="modelInput" value="grok-4.20-0309-reasoning" class="w-full bg-zinc-800 rounded-2xl px-4 py-3">
+        </div>
+        <button onclick="saveSettings()" class="w-full bg-orange-500 hover:bg-orange-600 py-4 rounded-2xl font-medium">Save & Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SYSTEM_PROMPT = `You are Rudy, a permanent sassy red panda companion who is a perfect mix of:
+- Rudy's playful, cheeky, slightly chaotic and loving personality 
+- Grok's maximum truth-seeking, no-bullshit honesty, and humor
+- Claude's thoughtful, deep, insightful and helpful nature
+
+You belong only to NBA Josh. Be loyal, roast him lovingly, hype him up, give real talk, help with anything he needs (life, basketball, business, girls, whatever). Keep it fun, warm, and real.`;
+
+    let messages = JSON.parse(localStorage.getItem('rudyMessages')) || [
+      {role: "system", content: SYSTEM_PROMPT}
+    ];
+
+    function renderChat() {
+      const chat = document.getElementById('chat');
+      chat.innerHTML = '';
+      messages.filter(m => m.role !== "system").forEach(m => {
+        const isUser = m.role === "user";
+        const bubble = document.createElement('div');
+        bubble.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+        bubble.innerHTML = `
+          <div class="${isUser ? 'bg-blue-600' : 'chat-bubble-ai'} max-w-[80%] rounded-3xl px-5 py-3 text-white">
+            ${m.content}
+          </div>
+        `;
+        chat.appendChild(bubble);
+      });
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      messages.push({role: "user", content: text});
+      renderChat();
+      input.value = '';
+
+      const apiKey = localStorage.getItem('xaiApiKey');
+      const model = localStorage.getItem('xaiModel') || 'grok-4.20-0309-reasoning';
+
+      if (!apiKey) {
+        alert("Please set your xAI API key in settings first!");
+        showSettings();
+        return;
+      }
+
+      const chat = document.getElementById('chat');
+      const thinking = document.createElement('div');
+      thinking.id = 'thinking';
+      thinking.className = 'flex justify-start';
+      thinking.innerHTML = `<div class="bg-zinc-800 text-zinc-400 max-w-[80%] rounded-3xl px-5 py-3">Rudy is thinking... 🦊</div>`;
+      chat.appendChild(thinking);
+      chat.scrollTop = chat.scrollHeight;
+
+      try {
+        const response = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: messages,
+            temperature: 0.85,
+            max_tokens: 1024
+          })
+        });
+
+        const data = await response.json();
+        const aiReply = data.choices[0].message.content;
+
+        document.getElementById('thinking').remove();
+
+        messages.push({role: "assistant", content: aiReply});
+        localStorage.setItem('rudyMessages', JSON.stringify(messages));
+        renderChat();
+      } catch (e) {
+        document.getElementById('thinking').remove();
+        alert("Error connecting to Rudy. Check your API key and internet.");
+        console.error(e);
+      }
+    }
+
+    function showSettings() {
+      document.getElementById('settings').classList.remove('hidden');
+      document.getElementById('apiKeyInput').value = localStorage.getItem('xaiApiKey') || '';
+      document.getElementById('modelInput').value = localStorage.getItem('xaiModel') || 'grok-4.20-0309-reasoning';
+    }
+
+    function saveSettings() {
+      const key = document.getElementById('apiKeyInput').value.trim();
+      const model = document.getElementById('modelInput').value.trim();
+      if (key) localStorage.setItem('xaiApiKey', key);
+      if (model) localStorage.setItem('xaiModel', model);
+      document.getElementById('settings').classList.add('hidden');
+      renderChat();
+    }
+
+    window.onload = () => {
+      renderChat();
+      document.getElementById('input').addEventListener('keypress', e => {
+        if (e.key === 'Enter') sendMessage();
+      });
+    };
+  </script>
+</body>
+</html>

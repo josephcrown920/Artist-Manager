@@ -14,3 +14,44 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Send a message and receive a response from Rudy (powered by xAI Grok)
+ * @summary Send a message to Rudy
+ */
+export const SendMessageBody = zod.object({
+  message: zod.string().describe("The user's message to Rudy"),
+});
+
+export const SendMessageResponse = zod.object({
+  reply: zod.string().describe("Rudy's reply"),
+  messages: zod.array(
+    zod.object({
+      role: zod.enum(["user", "assistant"]),
+      content: zod.string(),
+      timestamp: zod.date(),
+    }),
+  ),
+});
+
+/**
+ * Get the stored chat message history
+ * @summary Get chat history
+ */
+export const GetChatHistoryResponse = zod.object({
+  messages: zod.array(
+    zod.object({
+      role: zod.enum(["user", "assistant"]),
+      content: zod.string(),
+      timestamp: zod.date(),
+    }),
+  ),
+});
+
+/**
+ * Clear all stored chat messages
+ * @summary Clear chat history
+ */
+export const ClearChatHistoryResponse = zod.object({
+  success: zod.boolean(),
+});

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Rudy - Your Panda"
+version = "1.0.0"
+id = "artifacts/rudy"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22562
+
+[services.development]
+run = "pnpm --filter @workspace/rudy run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/rudy", "run", "build" ]
+publicDir = "artifacts/rudy/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22562"
+BASE_PATH = "/"
