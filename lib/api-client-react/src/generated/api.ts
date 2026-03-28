@@ -17,12 +17,27 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AgentChatRequest,
+  AgentChatResponse,
+  AgentConversationResponse,
+  AutopilotRequest,
+  AutopilotResponse,
   ChatHistoryResponse,
   ChatRequest,
   ChatResponse,
   ClearHistoryResponse,
-  ErrorResponse,
+  CreateTaskRequest,
+  EngagementHistoryResponse,
+  EngagementQueueResponse,
+  GenerateEngagementRequest,
+  GenerateEngagementResponse,
   HealthStatus,
+  PostEngagementResponse,
+  SaveSettingsRequest,
+  SettingsResponse,
+  TaskResponse,
+  TasksResponse,
+  UpdateTaskRequest,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -35,7 +50,6 @@ type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const getHealthCheckUrl = () => {
@@ -111,8 +125,7 @@ export function useHealthCheck<
 }
 
 /**
- * Send a message and receive a response from Rudy (powered by xAI Grok)
- * @summary Send a message to Rudy
+ * @summary Send message to Rudy
  */
 export const getSendMessageUrl = () => {
   return `/api/chat`;
@@ -131,7 +144,7 @@ export const sendMessage = async (
 };
 
 export const getSendMessageMutationOptions = <
-  TError = ErrorType<ErrorResponse>,
+  TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -172,13 +185,13 @@ export type SendMessageMutationResult = NonNullable<
   Awaited<ReturnType<typeof sendMessage>>
 >;
 export type SendMessageMutationBody = BodyType<ChatRequest>;
-export type SendMessageMutationError = ErrorType<ErrorResponse>;
+export type SendMessageMutationError = ErrorType<unknown>;
 
 /**
- * @summary Send a message to Rudy
+ * @summary Send message to Rudy
  */
 export const useSendMessage = <
-  TError = ErrorType<ErrorResponse>,
+  TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -198,8 +211,7 @@ export const useSendMessage = <
 };
 
 /**
- * Get the stored chat message history
- * @summary Get chat history
+ * @summary Get Rudy chat history
  */
 export const getGetChatHistoryUrl = () => {
   return `/api/chat/history`;
@@ -250,7 +262,7 @@ export type GetChatHistoryQueryResult = NonNullable<
 export type GetChatHistoryQueryError = ErrorType<unknown>;
 
 /**
- * @summary Get chat history
+ * @summary Get Rudy chat history
  */
 
 export function useGetChatHistory<
@@ -274,8 +286,7 @@ export function useGetChatHistory<
 }
 
 /**
- * Clear all stored chat messages
- * @summary Clear chat history
+ * @summary Clear Rudy chat history
  */
 export const getClearChatHistoryUrl = () => {
   return `/api/chat/history`;
@@ -333,7 +344,7 @@ export type ClearChatHistoryMutationResult = NonNullable<
 export type ClearChatHistoryMutationError = ErrorType<unknown>;
 
 /**
- * @summary Clear chat history
+ * @summary Clear Rudy chat history
  */
 export const useClearChatHistory = <
   TError = ErrorType<unknown>,
@@ -353,4 +364,1251 @@ export const useClearChatHistory = <
   TContext
 > => {
   return useMutation(getClearChatHistoryMutationOptions(options));
+};
+
+/**
+ * @summary Chat with an artist manager agent
+ */
+export const getChatWithAgentUrl = () => {
+  return `/api/agents/chat`;
+};
+
+export const chatWithAgent = async (
+  agentChatRequest: AgentChatRequest,
+  options?: RequestInit,
+): Promise<AgentChatResponse> => {
+  return customFetch<AgentChatResponse>(getChatWithAgentUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(agentChatRequest),
+  });
+};
+
+export const getChatWithAgentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof chatWithAgent>>,
+    TError,
+    { data: BodyType<AgentChatRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof chatWithAgent>>,
+  TError,
+  { data: BodyType<AgentChatRequest> },
+  TContext
+> => {
+  const mutationKey = ["chatWithAgent"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof chatWithAgent>>,
+    { data: BodyType<AgentChatRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return chatWithAgent(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ChatWithAgentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof chatWithAgent>>
+>;
+export type ChatWithAgentMutationBody = BodyType<AgentChatRequest>;
+export type ChatWithAgentMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Chat with an artist manager agent
+ */
+export const useChatWithAgent = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof chatWithAgent>>,
+    TError,
+    { data: BodyType<AgentChatRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof chatWithAgent>>,
+  TError,
+  { data: BodyType<AgentChatRequest> },
+  TContext
+> => {
+  return useMutation(getChatWithAgentMutationOptions(options));
+};
+
+/**
+ * @summary Get conversation history for an agent
+ */
+export const getGetAgentConversationUrl = (
+  agentType: "manager" | "assistant" | "pr" | "social",
+) => {
+  return `/api/agents/conversations/${agentType}`;
+};
+
+export const getAgentConversation = async (
+  agentType: "manager" | "assistant" | "pr" | "social",
+  options?: RequestInit,
+): Promise<AgentConversationResponse> => {
+  return customFetch<AgentConversationResponse>(
+    getGetAgentConversationUrl(agentType),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getGetAgentConversationQueryKey = (
+  agentType: "manager" | "assistant" | "pr" | "social",
+) => {
+  return [`/api/agents/conversations/${agentType}`] as const;
+};
+
+export const getGetAgentConversationQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAgentConversation>>,
+  TError = ErrorType<unknown>,
+>(
+  agentType: "manager" | "assistant" | "pr" | "social",
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getAgentConversation>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetAgentConversationQueryKey(agentType);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAgentConversation>>
+  > = ({ signal }) =>
+    getAgentConversation(agentType, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!agentType,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAgentConversation>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetAgentConversationQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAgentConversation>>
+>;
+export type GetAgentConversationQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get conversation history for an agent
+ */
+
+export function useGetAgentConversation<
+  TData = Awaited<ReturnType<typeof getAgentConversation>>,
+  TError = ErrorType<unknown>,
+>(
+  agentType: "manager" | "assistant" | "pr" | "social",
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getAgentConversation>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetAgentConversationQueryOptions(agentType, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Clear conversation history for an agent
+ */
+export const getClearAgentConversationUrl = (
+  agentType: "manager" | "assistant" | "pr" | "social",
+) => {
+  return `/api/agents/conversations/${agentType}`;
+};
+
+export const clearAgentConversation = async (
+  agentType: "manager" | "assistant" | "pr" | "social",
+  options?: RequestInit,
+): Promise<ClearHistoryResponse> => {
+  return customFetch<ClearHistoryResponse>(
+    getClearAgentConversationUrl(agentType),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+export const getClearAgentConversationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof clearAgentConversation>>,
+    TError,
+    { agentType: "manager" | "assistant" | "pr" | "social" },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof clearAgentConversation>>,
+  TError,
+  { agentType: "manager" | "assistant" | "pr" | "social" },
+  TContext
+> => {
+  const mutationKey = ["clearAgentConversation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof clearAgentConversation>>,
+    { agentType: "manager" | "assistant" | "pr" | "social" }
+  > = (props) => {
+    const { agentType } = props ?? {};
+
+    return clearAgentConversation(agentType, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ClearAgentConversationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof clearAgentConversation>>
+>;
+
+export type ClearAgentConversationMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Clear conversation history for an agent
+ */
+export const useClearAgentConversation = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof clearAgentConversation>>,
+    TError,
+    { agentType: "manager" | "assistant" | "pr" | "social" },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof clearAgentConversation>>,
+  TError,
+  { agentType: "manager" | "assistant" | "pr" | "social" },
+  TContext
+> => {
+  return useMutation(getClearAgentConversationMutationOptions(options));
+};
+
+/**
+ * @summary Get all tasks
+ */
+export const getGetTasksUrl = () => {
+  return `/api/tasks`;
+};
+
+export const getTasks = async (
+  options?: RequestInit,
+): Promise<TasksResponse> => {
+  return customFetch<TasksResponse>(getGetTasksUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetTasksQueryKey = () => {
+  return [`/api/tasks`] as const;
+};
+
+export const getGetTasksQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTasks>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetTasksQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTasks>>> = ({
+    signal,
+  }) => getTasks({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTasks>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetTasksQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTasks>>
+>;
+export type GetTasksQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get all tasks
+ */
+
+export function useGetTasks<
+  TData = Awaited<ReturnType<typeof getTasks>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetTasksQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a task
+ */
+export const getCreateTaskUrl = () => {
+  return `/api/tasks`;
+};
+
+export const createTask = async (
+  createTaskRequest: CreateTaskRequest,
+  options?: RequestInit,
+): Promise<TaskResponse> => {
+  return customFetch<TaskResponse>(getCreateTaskUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createTaskRequest),
+  });
+};
+
+export const getCreateTaskMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createTask>>,
+    TError,
+    { data: BodyType<CreateTaskRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createTask>>,
+  TError,
+  { data: BodyType<CreateTaskRequest> },
+  TContext
+> => {
+  const mutationKey = ["createTask"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createTask>>,
+    { data: BodyType<CreateTaskRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createTask(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateTaskMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createTask>>
+>;
+export type CreateTaskMutationBody = BodyType<CreateTaskRequest>;
+export type CreateTaskMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create a task
+ */
+export const useCreateTask = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createTask>>,
+    TError,
+    { data: BodyType<CreateTaskRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createTask>>,
+  TError,
+  { data: BodyType<CreateTaskRequest> },
+  TContext
+> => {
+  return useMutation(getCreateTaskMutationOptions(options));
+};
+
+/**
+ * @summary Update a task
+ */
+export const getUpdateTaskUrl = (id: number) => {
+  return `/api/tasks/${id}`;
+};
+
+export const updateTask = async (
+  id: number,
+  updateTaskRequest: UpdateTaskRequest,
+  options?: RequestInit,
+): Promise<TaskResponse> => {
+  return customFetch<TaskResponse>(getUpdateTaskUrl(id), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateTaskRequest),
+  });
+};
+
+export const getUpdateTaskMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateTask>>,
+    TError,
+    { id: number; data: BodyType<UpdateTaskRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateTask>>,
+  TError,
+  { id: number; data: BodyType<UpdateTaskRequest> },
+  TContext
+> => {
+  const mutationKey = ["updateTask"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateTask>>,
+    { id: number; data: BodyType<UpdateTaskRequest> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateTask(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateTaskMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateTask>>
+>;
+export type UpdateTaskMutationBody = BodyType<UpdateTaskRequest>;
+export type UpdateTaskMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update a task
+ */
+export const useUpdateTask = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateTask>>,
+    TError,
+    { id: number; data: BodyType<UpdateTaskRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateTask>>,
+  TError,
+  { id: number; data: BodyType<UpdateTaskRequest> },
+  TContext
+> => {
+  return useMutation(getUpdateTaskMutationOptions(options));
+};
+
+/**
+ * @summary Delete a task
+ */
+export const getDeleteTaskUrl = (id: number) => {
+  return `/api/tasks/${id}`;
+};
+
+export const deleteTask = async (
+  id: number,
+  options?: RequestInit,
+): Promise<ClearHistoryResponse> => {
+  return customFetch<ClearHistoryResponse>(getDeleteTaskUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteTaskMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteTask>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteTask>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteTask"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteTask>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteTask(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteTaskMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteTask>>
+>;
+
+export type DeleteTaskMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a task
+ */
+export const useDeleteTask = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteTask>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteTask>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteTaskMutationOptions(options));
+};
+
+/**
+ * @summary Generate engagement queue from Twitter search
+ */
+export const getGenerateEngagementUrl = () => {
+  return `/api/engagement/generate`;
+};
+
+export const generateEngagement = async (
+  generateEngagementRequest: GenerateEngagementRequest,
+  options?: RequestInit,
+): Promise<GenerateEngagementResponse> => {
+  return customFetch<GenerateEngagementResponse>(getGenerateEngagementUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(generateEngagementRequest),
+  });
+};
+
+export const getGenerateEngagementMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateEngagement>>,
+    TError,
+    { data: BodyType<GenerateEngagementRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateEngagement>>,
+  TError,
+  { data: BodyType<GenerateEngagementRequest> },
+  TContext
+> => {
+  const mutationKey = ["generateEngagement"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateEngagement>>,
+    { data: BodyType<GenerateEngagementRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generateEngagement(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateEngagementMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateEngagement>>
+>;
+export type GenerateEngagementMutationBody =
+  BodyType<GenerateEngagementRequest>;
+export type GenerateEngagementMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Generate engagement queue from Twitter search
+ */
+export const useGenerateEngagement = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateEngagement>>,
+    TError,
+    { data: BodyType<GenerateEngagementRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateEngagement>>,
+  TError,
+  { data: BodyType<GenerateEngagementRequest> },
+  TContext
+> => {
+  return useMutation(getGenerateEngagementMutationOptions(options));
+};
+
+/**
+ * @summary Get pending engagement queue
+ */
+export const getGetEngagementQueueUrl = () => {
+  return `/api/engagement/queue`;
+};
+
+export const getEngagementQueue = async (
+  options?: RequestInit,
+): Promise<EngagementQueueResponse> => {
+  return customFetch<EngagementQueueResponse>(getGetEngagementQueueUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetEngagementQueueQueryKey = () => {
+  return [`/api/engagement/queue`] as const;
+};
+
+export const getGetEngagementQueueQueryOptions = <
+  TData = Awaited<ReturnType<typeof getEngagementQueue>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getEngagementQueue>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetEngagementQueueQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getEngagementQueue>>
+  > = ({ signal }) => getEngagementQueue({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getEngagementQueue>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetEngagementQueueQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getEngagementQueue>>
+>;
+export type GetEngagementQueueQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get pending engagement queue
+ */
+
+export function useGetEngagementQueue<
+  TData = Awaited<ReturnType<typeof getEngagementQueue>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getEngagementQueue>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetEngagementQueueQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Approve and post an engagement
+ */
+export const getPostEngagementUrl = (id: number) => {
+  return `/api/engagement/queue/${id}/post`;
+};
+
+export const postEngagement = async (
+  id: number,
+  options?: RequestInit,
+): Promise<PostEngagementResponse> => {
+  return customFetch<PostEngagementResponse>(getPostEngagementUrl(id), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getPostEngagementMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postEngagement>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof postEngagement>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["postEngagement"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof postEngagement>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return postEngagement(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PostEngagementMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postEngagement>>
+>;
+
+export type PostEngagementMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Approve and post an engagement
+ */
+export const usePostEngagement = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof postEngagement>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof postEngagement>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getPostEngagementMutationOptions(options));
+};
+
+/**
+ * @summary Remove item from queue
+ */
+export const getDeleteEngagementItemUrl = (id: number) => {
+  return `/api/engagement/queue/${id}`;
+};
+
+export const deleteEngagementItem = async (
+  id: number,
+  options?: RequestInit,
+): Promise<ClearHistoryResponse> => {
+  return customFetch<ClearHistoryResponse>(getDeleteEngagementItemUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteEngagementItemMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteEngagementItem>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteEngagementItem>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteEngagementItem"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteEngagementItem>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteEngagementItem(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteEngagementItemMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteEngagementItem>>
+>;
+
+export type DeleteEngagementItemMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Remove item from queue
+ */
+export const useDeleteEngagementItem = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteEngagementItem>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteEngagementItem>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteEngagementItemMutationOptions(options));
+};
+
+/**
+ * @summary Get engagement history
+ */
+export const getGetEngagementHistoryUrl = () => {
+  return `/api/engagement/history`;
+};
+
+export const getEngagementHistory = async (
+  options?: RequestInit,
+): Promise<EngagementHistoryResponse> => {
+  return customFetch<EngagementHistoryResponse>(getGetEngagementHistoryUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetEngagementHistoryQueryKey = () => {
+  return [`/api/engagement/history`] as const;
+};
+
+export const getGetEngagementHistoryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getEngagementHistory>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getEngagementHistory>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetEngagementHistoryQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getEngagementHistory>>
+  > = ({ signal }) => getEngagementHistory({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getEngagementHistory>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetEngagementHistoryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getEngagementHistory>>
+>;
+export type GetEngagementHistoryQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get engagement history
+ */
+
+export function useGetEngagementHistory<
+  TData = Awaited<ReturnType<typeof getEngagementHistory>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getEngagementHistory>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetEngagementHistoryQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Enable or disable autopilot engagement
+ */
+export const getSetAutopilotUrl = () => {
+  return `/api/engagement/autopilot`;
+};
+
+export const setAutopilot = async (
+  autopilotRequest: AutopilotRequest,
+  options?: RequestInit,
+): Promise<AutopilotResponse> => {
+  return customFetch<AutopilotResponse>(getSetAutopilotUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(autopilotRequest),
+  });
+};
+
+export const getSetAutopilotMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setAutopilot>>,
+    TError,
+    { data: BodyType<AutopilotRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setAutopilot>>,
+  TError,
+  { data: BodyType<AutopilotRequest> },
+  TContext
+> => {
+  const mutationKey = ["setAutopilot"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setAutopilot>>,
+    { data: BodyType<AutopilotRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return setAutopilot(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetAutopilotMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setAutopilot>>
+>;
+export type SetAutopilotMutationBody = BodyType<AutopilotRequest>;
+export type SetAutopilotMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Enable or disable autopilot engagement
+ */
+export const useSetAutopilot = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setAutopilot>>,
+    TError,
+    { data: BodyType<AutopilotRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof setAutopilot>>,
+  TError,
+  { data: BodyType<AutopilotRequest> },
+  TContext
+> => {
+  return useMutation(getSetAutopilotMutationOptions(options));
+};
+
+/**
+ * @summary Get app settings
+ */
+export const getGetSettingsUrl = () => {
+  return `/api/settings`;
+};
+
+export const getSettings = async (
+  options?: RequestInit,
+): Promise<SettingsResponse> => {
+  return customFetch<SettingsResponse>(getGetSettingsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSettingsQueryKey = () => {
+  return [`/api/settings`] as const;
+};
+
+export const getGetSettingsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSettings>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSettings>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSettingsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSettings>>> = ({
+    signal,
+  }) => getSettings({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSettings>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSettingsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSettings>>
+>;
+export type GetSettingsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get app settings
+ */
+
+export function useGetSettings<
+  TData = Awaited<ReturnType<typeof getSettings>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSettings>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSettingsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Save app settings
+ */
+export const getSaveSettingsUrl = () => {
+  return `/api/settings`;
+};
+
+export const saveSettings = async (
+  saveSettingsRequest: SaveSettingsRequest,
+  options?: RequestInit,
+): Promise<SettingsResponse> => {
+  return customFetch<SettingsResponse>(getSaveSettingsUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(saveSettingsRequest),
+  });
+};
+
+export const getSaveSettingsMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof saveSettings>>,
+    TError,
+    { data: BodyType<SaveSettingsRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof saveSettings>>,
+  TError,
+  { data: BodyType<SaveSettingsRequest> },
+  TContext
+> => {
+  const mutationKey = ["saveSettings"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof saveSettings>>,
+    { data: BodyType<SaveSettingsRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return saveSettings(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SaveSettingsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof saveSettings>>
+>;
+export type SaveSettingsMutationBody = BodyType<SaveSettingsRequest>;
+export type SaveSettingsMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Save app settings
+ */
+export const useSaveSettings = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof saveSettings>>,
+    TError,
+    { data: BodyType<SaveSettingsRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof saveSettings>>,
+  TError,
+  { data: BodyType<SaveSettingsRequest> },
+  TContext
+> => {
+  return useMutation(getSaveSettingsMutationOptions(options));
 };

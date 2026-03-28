@@ -8,7 +8,6 @@
 import type { ChatMessage } from "./chatMessage";
 
 export interface ChatResponse {
-  /** Rudy's reply */
   reply: string;
   messages: ChatMessage[];
 }

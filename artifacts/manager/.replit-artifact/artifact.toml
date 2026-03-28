@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/manager/"
+title = "Artist Manager Autopilot"
+version = "1.0.0"
+id = "artifacts/manager"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/manager/" ]
+localPort = 24159
+
+[services.development]
+run = "pnpm --filter @workspace/manager run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/manager", "run", "build" ]
+publicDir = "artifacts/manager/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24159"
+BASE_PATH = "/manager/"

@@ -24,12 +24,10 @@ export interface ChatMessage {
 }
 
 export interface ChatRequest {
-  /** The user's message to Rudy */
   message: string;
 }
 
 export interface ChatResponse {
-  /** Rudy's reply */
   reply: string;
   messages: ChatMessage[];
 }
@@ -44,4 +42,206 @@ export interface ClearHistoryResponse {
 
 export interface ErrorResponse {
   error: string;
+}
+
+export type AgentChatRequestAgentType =
+  (typeof AgentChatRequestAgentType)[keyof typeof AgentChatRequestAgentType];
+
+export const AgentChatRequestAgentType = {
+  manager: "manager",
+  assistant: "assistant",
+  pr: "pr",
+  social: "social",
+} as const;
+
+export interface AgentChatRequest {
+  agentType: AgentChatRequestAgentType;
+  message: string;
+}
+
+export type AgentMessageRole =
+  (typeof AgentMessageRole)[keyof typeof AgentMessageRole];
+
+export const AgentMessageRole = {
+  user: "user",
+  assistant: "assistant",
+} as const;
+
+export interface AgentMessage {
+  role: AgentMessageRole;
+  content: string;
+  timestamp: string;
+}
+
+export interface AgentChatResponse {
+  reply: string;
+  agentType: string;
+  messages: AgentMessage[];
+}
+
+export interface AgentConversationResponse {
+  messages: AgentMessage[];
+  agentType: string;
+}
+
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
+
+export const TaskStatus = {
+  todo: "todo",
+  in_progress: "in_progress",
+  done: "done",
+} as const;
+
+export type TaskPriority = (typeof TaskPriority)[keyof typeof TaskPriority];
+
+export const TaskPriority = {
+  low: "low",
+  medium: "medium",
+  high: "high",
+} as const;
+
+export interface Task {
+  id: number;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueDate?: string | null;
+  createdAt: string;
+}
+
+export interface TasksResponse {
+  tasks: Task[];
+}
+
+export interface TaskResponse {
+  task: Task;
+}
+
+export type CreateTaskRequestPriority =
+  (typeof CreateTaskRequestPriority)[keyof typeof CreateTaskRequestPriority];
+
+export const CreateTaskRequestPriority = {
+  low: "low",
+  medium: "medium",
+  high: "high",
+} as const;
+
+export interface CreateTaskRequest {
+  title: string;
+  description?: string;
+  priority: CreateTaskRequestPriority;
+  dueDate?: string | null;
+}
+
+export type UpdateTaskRequestStatus =
+  (typeof UpdateTaskRequestStatus)[keyof typeof UpdateTaskRequestStatus];
+
+export const UpdateTaskRequestStatus = {
+  todo: "todo",
+  in_progress: "in_progress",
+  done: "done",
+} as const;
+
+export type UpdateTaskRequestPriority =
+  (typeof UpdateTaskRequestPriority)[keyof typeof UpdateTaskRequestPriority];
+
+export const UpdateTaskRequestPriority = {
+  low: "low",
+  medium: "medium",
+  high: "high",
+} as const;
+
+export interface UpdateTaskRequest {
+  title?: string;
+  description?: string;
+  status?: UpdateTaskRequestStatus;
+  priority?: UpdateTaskRequestPriority;
+  dueDate?: string | null;
+}
+
+export type EngagementItemAction =
+  (typeof EngagementItemAction)[keyof typeof EngagementItemAction];
+
+export const EngagementItemAction = {
+  like: "like",
+  reply: "reply",
+  like_and_reply: "like_and_reply",
+} as const;
+
+export type EngagementItemStatus =
+  (typeof EngagementItemStatus)[keyof typeof EngagementItemStatus];
+
+export const EngagementItemStatus = {
+  pending: "pending",
+  posted: "posted",
+  rejected: "rejected",
+} as const;
+
+export interface EngagementItem {
+  id: number;
+  tweetId: string;
+  tweetText: string;
+  tweetAuthor: string;
+  action: EngagementItemAction;
+  generatedReply?: string | null;
+  status: EngagementItemStatus;
+  createdAt: string;
+  postedAt?: string | null;
+}
+
+export interface GenerateEngagementRequest {
+  keywords: string[];
+  count?: number;
+}
+
+export interface GenerateEngagementResponse {
+  generated: number;
+  items: EngagementItem[];
+}
+
+export interface EngagementQueueResponse {
+  items: EngagementItem[];
+}
+
+export interface PostEngagementResponse {
+  success: boolean;
+  item: EngagementItem;
+}
+
+export interface EngagementHistoryResponse {
+  items: EngagementItem[];
+  total: number;
+}
+
+export interface AutopilotRequest {
+  enabled: boolean;
+  keywords?: string[];
+  intervalMinutes?: number;
+}
+
+export interface AutopilotResponse {
+  enabled: boolean;
+  keywords: string[];
+  intervalMinutes: number;
+  nextRunAt?: string | null;
+}
+
+export interface SettingsResponse {
+  artistName: string;
+  genre: string;
+  twitterConnected: boolean;
+  engagementKeywords: string[];
+  autopilotEnabled: boolean;
+}
+
+export interface SaveSettingsRequest {
+  artistName?: string;
+  genre?: string;
+  twitterBearerToken?: string;
+  twitterApiKey?: string;
+  twitterApiSecret?: string;
+  twitterAccessToken?: string;
+  twitterAccessSecret?: string;
+  engagementKeywords?: string[];
 }

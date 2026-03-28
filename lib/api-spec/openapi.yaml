@@ -10,14 +10,21 @@ tags:
   - name: health
     description: Health operations
   - name: chat
-    description: Rudy AI chat operations
+    description: Rudy AI chat
+  - name: agents
+    description: Artist manager AI agents
+  - name: tasks
+    description: Task management
+  - name: engagement
+    description: Social media engagement engine
+  - name: settings
+    description: App settings
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -29,8 +36,7 @@ paths:
     post:
       operationId: sendMessage
       tags: [chat]
-      summary: Send a message to Rudy
-      description: Send a message and receive a response from Rudy (powered by xAI Grok)
+      summary: Send message to Rudy
       requestBody:
         required: true
         content:
@@ -39,23 +45,16 @@ paths:
               $ref: "#/components/schemas/ChatRequest"
       responses:
         "200":
-          description: Successful response from Rudy
+          description: Rudy's reply
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ChatResponse"
-        "500":
-          description: Error communicating with AI
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /chat/history:
     get:
       operationId: getChatHistory
       tags: [chat]
-      summary: Get chat history
-      description: Get the stored chat message history
+      summary: Get Rudy chat history
       responses:
         "200":
           description: Chat history
@@ -66,15 +65,264 @@ paths:
     delete:
       operationId: clearChatHistory
       tags: [chat]
-      summary: Clear chat history
-      description: Clear all stored chat messages
+      summary: Clear Rudy chat history
       responses:
         "200":
-          description: History cleared
+          description: Cleared
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClearHistoryResponse"
+  /agents/chat:
+    post:
+      operationId: chatWithAgent
+      tags: [agents]
+      summary: Chat with an artist manager agent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgentChatRequest"
+      responses:
+        "200":
+          description: Agent response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentChatResponse"
+  /agents/conversations/{agentType}:
+    get:
+      operationId: getAgentConversation
+      tags: [agents]
+      summary: Get conversation history for an agent
+      parameters:
+        - name: agentType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [manager, assistant, pr, social]
+      responses:
+        "200":
+          description: Conversation history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentConversationResponse"
+    delete:
+      operationId: clearAgentConversation
+      tags: [agents]
+      summary: Clear conversation history for an agent
+      parameters:
+        - name: agentType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [manager, assistant, pr, social]
+      responses:
+        "200":
+          description: Cleared
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClearHistoryResponse"
+  /tasks:
+    get:
+      operationId: getTasks
+      tags: [tasks]
+      summary: Get all tasks
+      responses:
+        "200":
+          description: Tasks list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TasksResponse"
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTaskRequest"
+      responses:
+        "201":
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+  /tasks/{id}:
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTaskRequest"
+      responses:
+        "200":
+          description: Task updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+    delete:
+      operationId: deleteTask
+      tags: [tasks]
+      summary: Delete a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClearHistoryResponse"
+  /engagement/generate:
+    post:
+      operationId: generateEngagement
+      tags: [engagement]
+      summary: Generate engagement queue from Twitter search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateEngagementRequest"
+      responses:
+        "200":
+          description: Generated items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateEngagementResponse"
+  /engagement/queue:
+    get:
+      operationId: getEngagementQueue
+      tags: [engagement]
+      summary: Get pending engagement queue
+      responses:
+        "200":
+          description: Queue items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EngagementQueueResponse"
+  /engagement/queue/{id}/post:
+    post:
+      operationId: postEngagement
+      tags: [engagement]
+      summary: Approve and post an engagement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Posted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostEngagementResponse"
+  /engagement/queue/{id}:
+    delete:
+      operationId: deleteEngagementItem
+      tags: [engagement]
+      summary: Remove item from queue
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClearHistoryResponse"
+  /engagement/history:
+    get:
+      operationId: getEngagementHistory
+      tags: [engagement]
+      summary: Get engagement history
+      responses:
+        "200":
+          description: History
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EngagementHistoryResponse"
+  /engagement/autopilot:
+    post:
+      operationId: setAutopilot
+      tags: [engagement]
+      summary: Enable or disable autopilot engagement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutopilotRequest"
+      responses:
+        "200":
+          description: Autopilot status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutopilotResponse"
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get app settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingsResponse"
+    post:
+      operationId: saveSettings
+      tags: [settings]
+      summary: Save app settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveSettingsRequest"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingsResponse"
 components:
   schemas:
     HealthStatus:
@@ -82,8 +330,7 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
     ChatMessage:
       type: object
       properties:
@@ -95,31 +342,23 @@ components:
         timestamp:
           type: string
           format: date-time
-      required:
-        - role
-        - content
-        - timestamp
+      required: [role, content, timestamp]
     ChatRequest:
       type: object
       properties:
         message:
           type: string
-          description: The user's message to Rudy
-      required:
-        - message
+      required: [message]
     ChatResponse:
       type: object
       properties:
         reply:
           type: string
-          description: Rudy's reply
         messages:
           type: array
           items:
             $ref: "#/components/schemas/ChatMessage"
-      required:
-        - reply
-        - messages
+      required: [reply, messages]
     ChatHistoryResponse:
       type: object
       properties:
@@ -127,19 +366,267 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ChatMessage"
-      required:
-        - messages
+      required: [messages]
     ClearHistoryResponse:
       type: object
       properties:
         success:
           type: boolean
-      required:
-        - success
+      required: [success]
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
-      required:
-        - error
+      required: [error]
+    AgentChatRequest:
+      type: object
+      properties:
+        agentType:
+          type: string
+          enum: [manager, assistant, pr, social]
+        message:
+          type: string
+      required: [agentType, message]
+    AgentMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+      required: [role, content, timestamp]
+    AgentChatResponse:
+      type: object
+      properties:
+        reply:
+          type: string
+        agentType:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentMessage"
+      required: [reply, agentType, messages]
+    AgentConversationResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentMessage"
+        agentType:
+          type: string
+      required: [messages, agentType]
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [todo, in_progress, done]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, status, priority, createdAt]
+    TasksResponse:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+      required: [tasks]
+    TaskResponse:
+      type: object
+      properties:
+        task:
+          $ref: "#/components/schemas/Task"
+      required: [task]
+    CreateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        priority:
+          type: string
+          enum: [low, medium, high]
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+      required: [title, priority]
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [todo, in_progress, done]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+    EngagementItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        tweetId:
+          type: string
+        tweetText:
+          type: string
+        tweetAuthor:
+          type: string
+        action:
+          type: string
+          enum: [like, reply, like_and_reply]
+        generatedReply:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, posted, rejected]
+        createdAt:
+          type: string
+          format: date-time
+        postedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, tweetId, tweetText, tweetAuthor, action, status, createdAt]
+    GenerateEngagementRequest:
+      type: object
+      properties:
+        keywords:
+          type: array
+          items:
+            type: string
+        count:
+          type: integer
+      required: [keywords]
+    GenerateEngagementResponse:
+      type: object
+      properties:
+        generated:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/EngagementItem"
+      required: [generated, items]
+    EngagementQueueResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/EngagementItem"
+      required: [items]
+    PostEngagementResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        item:
+          $ref: "#/components/schemas/EngagementItem"
+      required: [success, item]
+    EngagementHistoryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/EngagementItem"
+        total:
+          type: integer
+      required: [items, total]
+    AutopilotRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        keywords:
+          type: array
+          items:
+            type: string
+        intervalMinutes:
+          type: integer
+      required: [enabled]
+    AutopilotResponse:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        keywords:
+          type: array
+          items:
+            type: string
+        intervalMinutes:
+          type: integer
+        nextRunAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [enabled, keywords, intervalMinutes]
+    SettingsResponse:
+      type: object
+      properties:
+        artistName:
+          type: string
+        genre:
+          type: string
+        twitterConnected:
+          type: boolean
+        engagementKeywords:
+          type: array
+          items:
+            type: string
+        autopilotEnabled:
+          type: boolean
+      required: [artistName, genre, twitterConnected, engagementKeywords, autopilotEnabled]
+    SaveSettingsRequest:
+      type: object
+      properties:
+        artistName:
+          type: string
+        genre:
+          type: string
+        twitterBearerToken:
+          type: string
+        twitterApiKey:
+          type: string
+        twitterApiSecret:
+          type: string
+        twitterAccessToken:
+          type: string
+        twitterAccessSecret:
+          type: string
+        engagementKeywords:
+          type: array
+          items:
+            type: string

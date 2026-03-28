@@ -8,7 +8,6 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -16,15 +15,14 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
- * Send a message and receive a response from Rudy (powered by xAI Grok)
- * @summary Send a message to Rudy
+ * @summary Send message to Rudy
  */
 export const SendMessageBody = zod.object({
-  message: zod.string().describe("The user's message to Rudy"),
+  message: zod.string(),
 });
 
 export const SendMessageResponse = zod.object({
-  reply: zod.string().describe("Rudy's reply"),
+  reply: zod.string(),
   messages: zod.array(
     zod.object({
       role: zod.enum(["user", "assistant"]),
@@ -35,8 +33,7 @@ export const SendMessageResponse = zod.object({
 });
 
 /**
- * Get the stored chat message history
- * @summary Get chat history
+ * @summary Get Rudy chat history
  */
 export const GetChatHistoryResponse = zod.object({
   messages: zod.array(
@@ -49,9 +46,268 @@ export const GetChatHistoryResponse = zod.object({
 });
 
 /**
- * Clear all stored chat messages
- * @summary Clear chat history
+ * @summary Clear Rudy chat history
  */
 export const ClearChatHistoryResponse = zod.object({
   success: zod.boolean(),
+});
+
+/**
+ * @summary Chat with an artist manager agent
+ */
+export const ChatWithAgentBody = zod.object({
+  agentType: zod.enum(["manager", "assistant", "pr", "social"]),
+  message: zod.string(),
+});
+
+export const ChatWithAgentResponse = zod.object({
+  reply: zod.string(),
+  agentType: zod.string(),
+  messages: zod.array(
+    zod.object({
+      role: zod.enum(["user", "assistant"]),
+      content: zod.string(),
+      timestamp: zod.date(),
+    }),
+  ),
+});
+
+/**
+ * @summary Get conversation history for an agent
+ */
+export const GetAgentConversationParams = zod.object({
+  agentType: zod.enum(["manager", "assistant", "pr", "social"]),
+});
+
+export const GetAgentConversationResponse = zod.object({
+  messages: zod.array(
+    zod.object({
+      role: zod.enum(["user", "assistant"]),
+      content: zod.string(),
+      timestamp: zod.date(),
+    }),
+  ),
+  agentType: zod.string(),
+});
+
+/**
+ * @summary Clear conversation history for an agent
+ */
+export const ClearAgentConversationParams = zod.object({
+  agentType: zod.enum(["manager", "assistant", "pr", "social"]),
+});
+
+export const ClearAgentConversationResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get all tasks
+ */
+export const GetTasksResponse = zod.object({
+  tasks: zod.array(
+    zod.object({
+      id: zod.number(),
+      title: zod.string(),
+      description: zod.string().optional(),
+      status: zod.enum(["todo", "in_progress", "done"]),
+      priority: zod.enum(["low", "medium", "high"]),
+      dueDate: zod.date().nullish(),
+      createdAt: zod.date(),
+    }),
+  ),
+});
+
+/**
+ * @summary Create a task
+ */
+export const CreateTaskBody = zod.object({
+  title: zod.string(),
+  description: zod.string().optional(),
+  priority: zod.enum(["low", "medium", "high"]),
+  dueDate: zod.date().nullish(),
+});
+
+/**
+ * @summary Update a task
+ */
+export const UpdateTaskParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateTaskBody = zod.object({
+  title: zod.string().optional(),
+  description: zod.string().optional(),
+  status: zod.enum(["todo", "in_progress", "done"]).optional(),
+  priority: zod.enum(["low", "medium", "high"]).optional(),
+  dueDate: zod.date().nullish(),
+});
+
+export const UpdateTaskResponse = zod.object({
+  task: zod.object({
+    id: zod.number(),
+    title: zod.string(),
+    description: zod.string().optional(),
+    status: zod.enum(["todo", "in_progress", "done"]),
+    priority: zod.enum(["low", "medium", "high"]),
+    dueDate: zod.date().nullish(),
+    createdAt: zod.date(),
+  }),
+});
+
+/**
+ * @summary Delete a task
+ */
+export const DeleteTaskParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteTaskResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Generate engagement queue from Twitter search
+ */
+export const GenerateEngagementBody = zod.object({
+  keywords: zod.array(zod.string()),
+  count: zod.number().optional(),
+});
+
+export const GenerateEngagementResponse = zod.object({
+  generated: zod.number(),
+  items: zod.array(
+    zod.object({
+      id: zod.number(),
+      tweetId: zod.string(),
+      tweetText: zod.string(),
+      tweetAuthor: zod.string(),
+      action: zod.enum(["like", "reply", "like_and_reply"]),
+      generatedReply: zod.string().nullish(),
+      status: zod.enum(["pending", "posted", "rejected"]),
+      createdAt: zod.date(),
+      postedAt: zod.date().nullish(),
+    }),
+  ),
+});
+
+/**
+ * @summary Get pending engagement queue
+ */
+export const GetEngagementQueueResponse = zod.object({
+  items: zod.array(
+    zod.object({
+      id: zod.number(),
+      tweetId: zod.string(),
+      tweetText: zod.string(),
+      tweetAuthor: zod.string(),
+      action: zod.enum(["like", "reply", "like_and_reply"]),
+      generatedReply: zod.string().nullish(),
+      status: zod.enum(["pending", "posted", "rejected"]),
+      createdAt: zod.date(),
+      postedAt: zod.date().nullish(),
+    }),
+  ),
+});
+
+/**
+ * @summary Approve and post an engagement
+ */
+export const PostEngagementParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const PostEngagementResponse = zod.object({
+  success: zod.boolean(),
+  item: zod.object({
+    id: zod.number(),
+    tweetId: zod.string(),
+    tweetText: zod.string(),
+    tweetAuthor: zod.string(),
+    action: zod.enum(["like", "reply", "like_and_reply"]),
+    generatedReply: zod.string().nullish(),
+    status: zod.enum(["pending", "posted", "rejected"]),
+    createdAt: zod.date(),
+    postedAt: zod.date().nullish(),
+  }),
+});
+
+/**
+ * @summary Remove item from queue
+ */
+export const DeleteEngagementItemParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteEngagementItemResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Get engagement history
+ */
+export const GetEngagementHistoryResponse = zod.object({
+  items: zod.array(
+    zod.object({
+      id: zod.number(),
+      tweetId: zod.string(),
+      tweetText: zod.string(),
+      tweetAuthor: zod.string(),
+      action: zod.enum(["like", "reply", "like_and_reply"]),
+      generatedReply: zod.string().nullish(),
+      status: zod.enum(["pending", "posted", "rejected"]),
+      createdAt: zod.date(),
+      postedAt: zod.date().nullish(),
+    }),
+  ),
+  total: zod.number(),
+});
+
+/**
+ * @summary Enable or disable autopilot engagement
+ */
+export const SetAutopilotBody = zod.object({
+  enabled: zod.boolean(),
+  keywords: zod.array(zod.string()).optional(),
+  intervalMinutes: zod.number().optional(),
+});
+
+export const SetAutopilotResponse = zod.object({
+  enabled: zod.boolean(),
+  keywords: zod.array(zod.string()),
+  intervalMinutes: zod.number(),
+  nextRunAt: zod.date().nullish(),
+});
+
+/**
+ * @summary Get app settings
+ */
+export const GetSettingsResponse = zod.object({
+  artistName: zod.string(),
+  genre: zod.string(),
+  twitterConnected: zod.boolean(),
+  engagementKeywords: zod.array(zod.string()),
+  autopilotEnabled: zod.boolean(),
+});
+
+/**
+ * @summary Save app settings
+ */
+export const SaveSettingsBody = zod.object({
+  artistName: zod.string().optional(),
+  genre: zod.string().optional(),
+  twitterBearerToken: zod.string().optional(),
+  twitterApiKey: zod.string().optional(),
+  twitterApiSecret: zod.string().optional(),
+  twitterAccessToken: zod.string().optional(),
+  twitterAccessSecret: zod.string().optional(),
+  engagementKeywords: zod.array(zod.string()).optional(),
+});
+
+export const SaveSettingsResponse = zod.object({
+  artistName: zod.string(),
+  genre: zod.string(),
+  twitterConnected: zod.boolean(),
+  engagementKeywords: zod.array(zod.string()),
+  autopilotEnabled: zod.boolean(),
 });

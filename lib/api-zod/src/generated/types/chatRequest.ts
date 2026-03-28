@@ -7,6 +7,5 @@
  */
 
 export interface ChatRequest {
-  /** The user's message to Rudy */
   message: string;
 }
