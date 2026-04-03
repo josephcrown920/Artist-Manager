@@ -14,4 +14,6 @@ export const AgentChatRequestAgentType = {
   assistant: "assistant",
   pr: "pr",
   social: "social",
+  playlister: "playlister",
+  advertiser: "advertiser",
 } as const;

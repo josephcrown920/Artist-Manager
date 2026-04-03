@@ -102,7 +102,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [manager, assistant, pr, social]
+            enum: [manager, assistant, pr, social, playlister, advertiser]
       responses:
         "200":
           description: Conversation history
@@ -120,7 +120,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [manager, assistant, pr, social]
+            enum: [manager, assistant, pr, social, playlister, advertiser]
       responses:
         "200":
           description: Cleared
@@ -384,7 +384,7 @@ components:
       properties:
         agentType:
           type: string
-          enum: [manager, assistant, pr, social]
+          enum: [manager, assistant, pr, social, playlister, advertiser]
         message:
           type: string
       required: [agentType, message]

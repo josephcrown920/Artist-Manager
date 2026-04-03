@@ -56,7 +56,14 @@ export const ClearChatHistoryResponse = zod.object({
  * @summary Chat with an artist manager agent
  */
 export const ChatWithAgentBody = zod.object({
-  agentType: zod.enum(["manager", "assistant", "pr", "social"]),
+  agentType: zod.enum([
+    "manager",
+    "assistant",
+    "pr",
+    "social",
+    "playlister",
+    "advertiser",
+  ]),
   message: zod.string(),
 });
 
@@ -76,7 +83,14 @@ export const ChatWithAgentResponse = zod.object({
  * @summary Get conversation history for an agent
  */
 export const GetAgentConversationParams = zod.object({
-  agentType: zod.enum(["manager", "assistant", "pr", "social"]),
+  agentType: zod.enum([
+    "manager",
+    "assistant",
+    "pr",
+    "social",
+    "playlister",
+    "advertiser",
+  ]),
 });
 
 export const GetAgentConversationResponse = zod.object({
@@ -94,7 +108,14 @@ export const GetAgentConversationResponse = zod.object({
  * @summary Clear conversation history for an agent
  */
 export const ClearAgentConversationParams = zod.object({
-  agentType: zod.enum(["manager", "assistant", "pr", "social"]),
+  agentType: zod.enum([
+    "manager",
+    "assistant",
+    "pr",
+    "social",
+    "playlister",
+    "advertiser",
+  ]),
 });
 
 export const ClearAgentConversationResponse = zod.object({

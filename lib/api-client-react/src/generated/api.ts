@@ -456,13 +456,25 @@ export const useChatWithAgent = <
  * @summary Get conversation history for an agent
  */
 export const getGetAgentConversationUrl = (
-  agentType: "manager" | "assistant" | "pr" | "social",
+  agentType:
+    | "manager"
+    | "assistant"
+    | "pr"
+    | "social"
+    | "playlister"
+    | "advertiser",
 ) => {
   return `/api/agents/conversations/${agentType}`;
 };
 
 export const getAgentConversation = async (
-  agentType: "manager" | "assistant" | "pr" | "social",
+  agentType:
+    | "manager"
+    | "assistant"
+    | "pr"
+    | "social"
+    | "playlister"
+    | "advertiser",
   options?: RequestInit,
 ): Promise<AgentConversationResponse> => {
   return customFetch<AgentConversationResponse>(
@@ -475,7 +487,13 @@ export const getAgentConversation = async (
 };
 
 export const getGetAgentConversationQueryKey = (
-  agentType: "manager" | "assistant" | "pr" | "social",
+  agentType:
+    | "manager"
+    | "assistant"
+    | "pr"
+    | "social"
+    | "playlister"
+    | "advertiser",
 ) => {
   return [`/api/agents/conversations/${agentType}`] as const;
 };
@@ -484,7 +502,13 @@ export const getGetAgentConversationQueryOptions = <
   TData = Awaited<ReturnType<typeof getAgentConversation>>,
   TError = ErrorType<unknown>,
 >(
-  agentType: "manager" | "assistant" | "pr" | "social",
+  agentType:
+    | "manager"
+    | "assistant"
+    | "pr"
+    | "social"
+    | "playlister"
+    | "advertiser",
   options?: {
     query?: UseQueryOptions<
       Awaited<ReturnType<typeof getAgentConversation>>,
@@ -529,7 +553,13 @@ export function useGetAgentConversation<
   TData = Awaited<ReturnType<typeof getAgentConversation>>,
   TError = ErrorType<unknown>,
 >(
-  agentType: "manager" | "assistant" | "pr" | "social",
+  agentType:
+    | "manager"
+    | "assistant"
+    | "pr"
+    | "social"
+    | "playlister"
+    | "advertiser",
   options?: {
     query?: UseQueryOptions<
       Awaited<ReturnType<typeof getAgentConversation>>,
@@ -552,13 +582,25 @@ export function useGetAgentConversation<
  * @summary Clear conversation history for an agent
  */
 export const getClearAgentConversationUrl = (
-  agentType: "manager" | "assistant" | "pr" | "social",
+  agentType:
+    | "manager"
+    | "assistant"
+    | "pr"
+    | "social"
+    | "playlister"
+    | "advertiser",
 ) => {
   return `/api/agents/conversations/${agentType}`;
 };
 
 export const clearAgentConversation = async (
-  agentType: "manager" | "assistant" | "pr" | "social",
+  agentType:
+    | "manager"
+    | "assistant"
+    | "pr"
+    | "social"
+    | "playlister"
+    | "advertiser",
   options?: RequestInit,
 ): Promise<ClearHistoryResponse> => {
   return customFetch<ClearHistoryResponse>(
@@ -577,14 +619,30 @@ export const getClearAgentConversationMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof clearAgentConversation>>,
     TError,
-    { agentType: "manager" | "assistant" | "pr" | "social" },
+    {
+      agentType:
+        | "manager"
+        | "assistant"
+        | "pr"
+        | "social"
+        | "playlister"
+        | "advertiser";
+    },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof clearAgentConversation>>,
   TError,
-  { agentType: "manager" | "assistant" | "pr" | "social" },
+  {
+    agentType:
+      | "manager"
+      | "assistant"
+      | "pr"
+      | "social"
+      | "playlister"
+      | "advertiser";
+  },
   TContext
 > => {
   const mutationKey = ["clearAgentConversation"];
@@ -598,7 +656,15 @@ export const getClearAgentConversationMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof clearAgentConversation>>,
-    { agentType: "manager" | "assistant" | "pr" | "social" }
+    {
+      agentType:
+        | "manager"
+        | "assistant"
+        | "pr"
+        | "social"
+        | "playlister"
+        | "advertiser";
+    }
   > = (props) => {
     const { agentType } = props ?? {};
 
@@ -624,14 +690,30 @@ export const useClearAgentConversation = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof clearAgentConversation>>,
     TError,
-    { agentType: "manager" | "assistant" | "pr" | "social" },
+    {
+      agentType:
+        | "manager"
+        | "assistant"
+        | "pr"
+        | "social"
+        | "playlister"
+        | "advertiser";
+    },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof clearAgentConversation>>,
   TError,
-  { agentType: "manager" | "assistant" | "pr" | "social" },
+  {
+    agentType:
+      | "manager"
+      | "assistant"
+      | "pr"
+      | "social"
+      | "playlister"
+      | "advertiser";
+  },
   TContext
 > => {
   return useMutation(getClearAgentConversationMutationOptions(options));

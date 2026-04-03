@@ -217,6 +217,14 @@ router.get("/history", async (req, res) => {
   }
 });
 
+router.get("/autopilot/status", (_req, res) => {
+  res.json({
+    enabled: autopilotConfig.enabled,
+    keywords: autopilotConfig.keywords,
+    intervalMinutes: autopilotConfig.intervalMinutes,
+  });
+});
+
 router.post("/autopilot", async (req, res) => {
   try {
     const body = SetAutopilotBody.parse(req.body);
