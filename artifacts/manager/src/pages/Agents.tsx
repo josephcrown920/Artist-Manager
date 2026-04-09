@@ -53,9 +53,14 @@ function ChatWindow({ agentId, agentColor }: { agentId: string; agentColor: stri
         body: JSON.stringify({ agentType: agentId, message: msg }),
       });
       const data = await res.json();
-      setMessages([...newMsgs, { role: "assistant", content: data.reply || "No response." }]);
-    } catch {
-      setMessages([...newMsgs, { role: "assistant", content: "⚠️ Error — check that the API server has xAI credits." }]);
+      if (!res.ok) {
+        const errDetail = data?.detail || data?.error || `Server error ${res.status}`;
+        setMessages([...newMsgs, { role: "assistant", content: `⚠️ ${errDetail}` }]);
+      } else {
+        setMessages([...newMsgs, { role: "assistant", content: data.reply || "⚠️ Empty reply received." }]);
+      }
+    } catch (e: any) {
+      setMessages([...newMsgs, { role: "assistant", content: `⚠️ Network error: ${e?.message || "Could not reach the API server."}` }]);
     } finally {
       setIsLoading(false);
     }

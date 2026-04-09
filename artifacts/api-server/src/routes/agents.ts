@@ -255,9 +255,10 @@ router.post("/chat", async (req, res) => {
 
     const result = ChatWithAgentResponse.parse({ reply, agentType, messages });
     res.json(result);
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Agent chat error");
-    res.status(500).json({ error: "Failed to get agent response" });
+    const detail = err?.message || "Failed to get agent response";
+    res.status(500).json({ error: "Failed to get agent response", detail });
   }
 });
 
