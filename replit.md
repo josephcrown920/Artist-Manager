@@ -50,17 +50,42 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 
 ## Packages
 
+### `artifacts/rudy` (`@workspace/rudy`)
+
+Rudy — sassy red panda AI companion chat app at `/`. Dark themed, powered by xAI Grok API.
+
+### `artifacts/manager` (`@workspace/manager`)
+
+Artist Manager Autopilot at `/manager/`. Multi-agent AI suite for music artist career management.
+
+**Pages:**
+- Dashboard — overview stats, daily industry tip, AI team grid
+- AI Agents (6) — Manager, Assistant, PR, Social Media, Playlister, Advertiser
+- Tasks — priority-based task management
+- Engagement Engine — Twitter/X search + AI reply generation + autopilot
+- Ad Campaigns — AI-generated ad drafts across Meta/TikTok/Google/YouTube/Spotify optimized for high reach, low CPM/CPC
+- Knowledge Base — 8 chapters of artist management research (fundamentals, streaming, playlists, social, PR, advertising, revenue, team building)
+- Settings — Artist profile, platform connections (Meta, TikTok, Google, Spotify, Apple Music, Audiomack, Boomplay, Twitter/X, Shopify, tracking pixels)
+
 ### `artifacts/api-server` (`@workspace/api-server`)
 
 Express 5 API server. Routes live in `src/routes/` and use `@workspace/api-zod` for request and response validation and `@workspace/db` for persistence.
 
 - Entry: `src/index.ts` — reads `PORT`, starts Express
 - App setup: `src/app.ts` — mounts CORS, JSON/urlencoded parsing, routes at `/api`
-- Routes: `src/routes/index.ts` mounts sub-routers; `src/routes/health.ts` exposes `GET /health` (full path: `/api/health`)
+- Routes: `src/routes/index.ts` mounts sub-routers
+  - `/api/chat` — Rudy xAI chat
+  - `/api/agents` — 6 AI agent conversations (manager, assistant, pr, social, playlister, advertiser)
+  - `/api/tasks` — Task CRUD
+  - `/api/engagement` — Twitter engagement engine + autopilot
+  - `/api/ad-drafts` — AI-generated ad campaign drafts
+  - `/api/settings` — Key/value app settings store
 - Depends on: `@workspace/db`, `@workspace/api-zod`
 - `pnpm --filter @workspace/api-server run dev` — run the dev server
 - `pnpm --filter @workspace/api-server run build` — production esbuild bundle (`dist/index.cjs`)
 - Build bundles an allowlist of deps (express, cors, pg, drizzle-orm, zod, etc.) and externalizes the rest
+
+**Important:** All AI features require xAI API credits at https://console.x.ai
 
 ### `lib/db` (`@workspace/db`)
 

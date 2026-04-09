@@ -5,12 +5,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState } from "react";
 import {
   LayoutDashboard, Bot, CheckSquare, Zap, Settings, BookOpen, Menu, X,
-  Music2, ChevronRight
+  Music2, ChevronRight, Megaphone
 } from "lucide-react";
 import Dashboard from "@/pages/Dashboard";
 import Agents from "@/pages/Agents";
 import Tasks from "@/pages/Tasks";
 import Engagement from "@/pages/Engagement";
+import AdCampaigns from "@/pages/AdCampaigns";
 import SettingsPage from "@/pages/SettingsPage";
 import KnowledgeBase from "@/pages/KnowledgeBase";
 import NotFound from "@/pages/not-found";
@@ -24,6 +25,7 @@ const NAV = [
   { path: "/agents", label: "AI Agents", icon: Bot },
   { path: "/tasks", label: "Tasks", icon: CheckSquare },
   { path: "/engagement", label: "Engagement", icon: Zap },
+  { path: "/ads", label: "Ad Campaigns", icon: Megaphone },
   { path: "/knowledge", label: "Knowledge Base", icon: BookOpen },
   { path: "/settings", label: "Settings", icon: Settings },
 ];
@@ -133,6 +135,7 @@ function Router() {
         <Route path="/agents" component={Agents} />
         <Route path="/tasks" component={Tasks} />
         <Route path="/engagement" component={Engagement} />
+        <Route path="/ads" component={AdCampaigns} />
         <Route path="/knowledge" component={KnowledgeBase} />
         <Route path="/settings" component={SettingsPage} />
         <Route component={NotFound} />
