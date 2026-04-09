@@ -132,21 +132,28 @@ Focus on campaigns that a hip-hop/rap artist would use to:
       return;
     }
 
+    if (!Array.isArray(campaigns)) {
+      res.status(500).json({ error: "AI generated invalid format — try again" });
+      return;
+    }
+
     const inserted = [];
     for (const c of campaigns) {
+      if (!c || typeof c !== "object") continue;
+
       const [row] = await db.insert(adDraftsTable).values({
-        platform: c.platform || "Unknown",
-        campaignName: c.campaignName || "Untitled Campaign",
-        objective: c.objective || "",
-        targetAudience: c.targetAudience || "",
-        adCopy: c.adCopy || "",
-        creativeSpecs: c.creativeSpecs || "",
-        placement: c.placement || "",
-        estimatedBudget: c.estimatedBudget || "",
-        estimatedCpm: c.estimatedCpm || "",
-        estimatedCpc: c.estimatedCpc || "",
-        estimatedReach: c.estimatedReach || "",
-        tips: c.tips || "",
+        platform: typeof c.platform === "string" ? c.platform : "Unknown",
+        campaignName: typeof c.campaignName === "string" ? c.campaignName : "Untitled Campaign",
+        objective: typeof c.objective === "string" ? c.objective : "",
+        targetAudience: typeof c.targetAudience === "string" ? c.targetAudience : "",
+        adCopy: typeof c.adCopy === "string" ? c.adCopy : "",
+        creativeSpecs: typeof c.creativeSpecs === "string" ? c.creativeSpecs : "",
+        placement: typeof c.placement === "string" ? c.placement : "",
+        estimatedBudget: typeof c.estimatedBudget === "string" ? c.estimatedBudget : "",
+        estimatedCpm: typeof c.estimatedCpm === "string" ? c.estimatedCpm : "",
+        estimatedCpc: typeof c.estimatedCpc === "string" ? c.estimatedCpc : "",
+        estimatedReach: typeof c.estimatedReach === "string" ? c.estimatedReach : "",
+        tips: typeof c.tips === "string" ? c.tips : "",
         status: "draft",
         generatedDate: today,
       }).returning();
@@ -156,19 +163,27 @@ Focus on campaigns that a hip-hop/rap artist would use to:
     res.json({ message: `Generated ${inserted.length} ad campaign drafts`, drafts: inserted });
   } catch (err: any) {
     req.log.error({ err }, "Generate ad drafts error");
-    res.status(500).json({ error: "Failed to generate ad drafts", detail: err?.message });
+    res.status(500).json({ error: "Failed to generate ad drafts" });
   }
 });
 
 router.patch("/:id/status", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      res.status(400).json({ error: "Invalid ID" });
+      return;
+    }
     const { status } = req.body;
     if (!["draft", "ready", "launched", "paused", "completed"].includes(status)) {
       res.status(400).json({ error: "Invalid status" });
       return;
     }
     const [row] = await db.update(adDraftsTable).set({ status }).where(eq(adDraftsTable.id, id)).returning();
+    if (!row) {
+      res.status(404).json({ error: "Draft not found" });
+      return;
+    }
     res.json(row);
   } catch (err) {
     req.log.error({ err }, "Update ad draft status error");
@@ -179,6 +194,10 @@ router.patch("/:id/status", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      res.status(400).json({ error: "Invalid ID" });
+      return;
+    }
     await db.delete(adDraftsTable).where(eq(adDraftsTable.id, id));
     res.json({ success: true });
   } catch (err) {

@@ -6,6 +6,7 @@ import tasksRouter from "./tasks";
 import engagementRouter from "./engagement";
 import settingsRouter from "./manager-settings";
 import adDraftsRouter from "./ad-drafts";
+import growthPlaybooksRouter from "./growth-playbooks";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use("/tasks", tasksRouter);
 router.use("/engagement", engagementRouter);
 router.use("/settings", settingsRouter);
 router.use("/ad-drafts", adDraftsRouter);
+router.use("/growth-playbooks", growthPlaybooksRouter);
 
 export default router;

@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState } from "react";
 import {
   LayoutDashboard, Bot, CheckSquare, Zap, Settings, BookOpen, Menu, X,
-  Music2, ChevronRight, Megaphone
+  Music2, ChevronRight, Megaphone, TrendingUp
 } from "lucide-react";
 import Dashboard from "@/pages/Dashboard";
 import Agents from "@/pages/Agents";
@@ -14,6 +14,7 @@ import Engagement from "@/pages/Engagement";
 import AdCampaigns from "@/pages/AdCampaigns";
 import SettingsPage from "@/pages/SettingsPage";
 import KnowledgeBase from "@/pages/KnowledgeBase";
+import GrowthPlaybooks from "@/pages/GrowthPlaybooks";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -23,9 +24,10 @@ const queryClient = new QueryClient({
 const NAV = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
   { path: "/agents", label: "AI Agents", icon: Bot },
+  { path: "/ads", label: "Ad Campaigns", icon: Megaphone },
+  { path: "/growth-playbooks", label: "Growth Playbooks", icon: TrendingUp },
   { path: "/tasks", label: "Tasks", icon: CheckSquare },
   { path: "/engagement", label: "Engagement", icon: Zap },
-  { path: "/ads", label: "Ad Campaigns", icon: Megaphone },
   { path: "/knowledge", label: "Knowledge Base", icon: BookOpen },
   { path: "/settings", label: "Settings", icon: Settings },
 ];
@@ -133,9 +135,10 @@ function Router() {
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/agents" component={Agents} />
+        <Route path="/ads" component={AdCampaigns} />
+        <Route path="/growth-playbooks" component={GrowthPlaybooks} />
         <Route path="/tasks" component={Tasks} />
         <Route path="/engagement" component={Engagement} />
-        <Route path="/ads" component={AdCampaigns} />
         <Route path="/knowledge" component={KnowledgeBase} />
         <Route path="/settings" component={SettingsPage} />
         <Route component={NotFound} />

@@ -116,6 +116,17 @@ Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used b
 
 Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
 
+### Ad Drafts & Spotify Growth Playbooks
+
+Two new features added to the Artist Manager Autopilot:
+
+- **Ad Drafts** (`/ad-drafts`): AI-generated ad campaign drafts across Meta, YouTube, TikTok, Spotify Marquee/Showcase, and Google Ads. Each draft includes platform, hook copy, CTA, targeting, budget suggestion, and objective. Drafts can be approved, archived, or deleted. Auto-generates on first visit.
+- **Spotify Growth Playbooks** (`/growth-playbooks`): Structured step-by-step playbooks for growing Spotify followers, categorized as pre-save campaigns, algorithm optimization, curator outreach, and follower engagement. Expandable cards show numbered steps.
+
+Database tables: `ad_drafts`, `growth_playbooks` (schema in `lib/db/src/schema/ad-drafts.ts` and `growth-playbooks.ts`).
+API routes: `/api/ad-drafts` and `/api/growth-playbooks` (in `artifacts/api-server/src/routes/`).
+Frontend pages: `artifacts/manager/src/pages/AdDrafts.tsx` and `GrowthPlaybooks.tsx`.
+
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.

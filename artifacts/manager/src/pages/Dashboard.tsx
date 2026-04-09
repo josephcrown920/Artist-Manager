@@ -131,6 +131,8 @@ export default function Dashboard() {
       <div>
         <h2 className="text-base font-semibold text-white mb-3">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <QuickActionCard title="Ad Campaign Drafts" desc="AI-generated ads for Meta, YouTube, TikTok & Spotify" href="/ads" color="hsl(0 72% 60%)" />
+          <QuickActionCard title="Spotify Growth Playbooks" desc="Step-by-step strategies to grow followers" href="/growth-playbooks" color="hsl(141 73% 50%)" />
           <QuickActionCard title="Chat with Manager" desc="Discuss career strategy & next moves" href="/agents" color="hsl(263 70% 65%)" />
           <QuickActionCard title="Generate Engagement Queue" desc="Find tweets to reply to & grow" href="/engagement" color="hsl(38 92% 55%)" />
           <QuickActionCard title="Add a Task" desc="Track action items & priorities" href="/tasks" color="hsl(142 71% 50%)" />
