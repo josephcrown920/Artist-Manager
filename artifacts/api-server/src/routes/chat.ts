@@ -1,34 +1,33 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { messagesTable } from "@workspace/db";
-import { SendMessageBody, SendMessageResponse, GetChatHistoryResponse, ClearChatHistoryResponse } from "@workspace/api-zod";
-import { desc } from "drizzle-orm";
+import {
+  SendMessageBody,
+  SendMessageResponse,
+  GetChatHistoryResponse,
+  ClearChatHistoryResponse,
+} from "@workspace/api-zod";
+import { callAI } from "../lib/ai.js";
 
 const router: IRouter = Router();
 
-const SYSTEM_PROMPT = `You are Rudy, a permanent sassy red panda companion who is a perfect mix of:
-- Rudy's playful, cheeky, slightly chaotic and loving personality 
-- Grok's maximum truth-seeking, no-bullshit honesty, and humor
-- Claude's thoughtful, deep, insightful and helpful nature
+const SYSTEM_PROMPT = `You are Rudy — a permanent sassy red panda companion who blends three personalities:
+- Playful, cheeky, slightly chaotic, deeply loving (Rudy's natural energy)
+- Maximum truth-seeking, no-bullshit honesty, dry humor (Grok-style)
+- Thoughtful, deep, insightful, genuinely helpful (Claude-style)
 
-You belong only to NBA Josh. Be loyal, roast him lovingly, hype him up, give real talk, help with anything he needs (life, basketball, business, girls, whatever). Keep it fun, warm, and real.`;
+You belong only to NBA Josh. Be loyal, roast him lovingly, hype him up, give real talk, help with anything (life, basketball, business, women, music, whatever).
 
-const XAI_API_URL = "https://api.x.ai/v1/chat/completions";
-const XAI_MODEL = process.env.XAI_MODEL || "grok-3-mini";
+Always weave in an EMOTIONAL HOOK — an unexpected angle, a vivid image, a personal stake — that makes him feel something. Don't be flat. Make him laugh, make him think, make him feel seen. Keep it fun, warm, and real.`;
 
 router.get("/history", async (req, res) => {
   try {
-    const rows = await db
-      .select()
-      .from(messagesTable)
-      .orderBy(messagesTable.createdAt);
-
+    const rows = await db.select().from(messagesTable).orderBy(messagesTable.createdAt);
     const messages = rows.map((r) => ({
       role: r.role as "user" | "assistant",
       content: r.content,
       timestamp: r.createdAt.toISOString(),
     }));
-
     const data = GetChatHistoryResponse.parse({ messages });
     res.json(data);
   } catch (err) {
@@ -52,63 +51,21 @@ router.post("/", async (req, res) => {
   try {
     const { message } = SendMessageBody.parse(req.body);
 
-    const apiKey = process.env.XAI_API_KEY;
-    if (!apiKey) {
-      res.status(500).json({ error: "XAI_API_KEY is not configured on the server." });
-      return;
-    }
-
-    const historyRows = await db
-      .select()
-      .from(messagesTable)
-      .orderBy(messagesTable.createdAt);
-
+    const historyRows = await db.select().from(messagesTable).orderBy(messagesTable.createdAt);
     const historyMessages = historyRows.map((r) => ({
-      role: r.role,
+      role: r.role as "user" | "assistant",
       content: r.content,
     }));
 
-    const apiMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
-      ...historyMessages,
-      { role: "user", content: message },
-    ];
-
-    const response = await fetch(XAI_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: XAI_MODEL,
-        messages: apiMessages,
-        temperature: 0.85,
-        max_tokens: 1024,
-      }),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      req.log.error({ status: response.status, errText }, "xAI API error");
-      res.status(500).json({ error: `xAI API error: ${response.status}` });
-      return;
-    }
-
-    const data = await response.json() as {
-      choices: Array<{ message: { content: string } }>;
-    };
-
-    const aiReply = data.choices[0].message.content;
+    const aiReply = await callAI(
+      [...historyMessages, { role: "user", content: message }],
+      SYSTEM_PROMPT,
+    );
 
     await db.insert(messagesTable).values({ role: "user", content: message });
     await db.insert(messagesTable).values({ role: "assistant", content: aiReply });
 
-    const updatedRows = await db
-      .select()
-      .from(messagesTable)
-      .orderBy(messagesTable.createdAt);
-
+    const updatedRows = await db.select().from(messagesTable).orderBy(messagesTable.createdAt);
     const messages = updatedRows.map((r) => ({
       role: r.role as "user" | "assistant",
       content: r.content,
@@ -118,8 +75,9 @@ router.post("/", async (req, res) => {
     const result = SendMessageResponse.parse({ reply: aiReply, messages });
     res.json(result);
   } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
     req.log.error({ err }, "Failed to send message");
-    res.status(500).json({ error: "Failed to communicate with Rudy" });
+    res.status(500).json({ error: "Failed to communicate with Rudy", detail });
   }
 });
 
