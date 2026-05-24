@@ -162,7 +162,8 @@ export default function SettingsPage() {
 
       <PlatformSection emoji="🐦" title="Twitter / X" subtitle="Required for the Engagement Engine"
         link="https://developer.twitter.com" linkText="Developer Portal">
-        <SecretInput label="Bearer Token" value={form.twitterBearerToken || ""} onChange={set("twitterBearerToken")} />
+        <SecretInput label="Bearer Token (for searching tweets)" value={form.twitterBearerToken || ""} onChange={set("twitterBearerToken")} />
+        <TextInput label="Your Twitter User ID (numeric — needed for posting/likes)" value={form.twitterUserId || ""} onChange={set("twitterUserId")} placeholder="e.g. 783214" />
         <div className="grid grid-cols-2 gap-3">
           <SecretInput label="API Key" value={form.twitterApiKey || ""} onChange={set("twitterApiKey")} />
           <SecretInput label="API Secret" value={form.twitterApiSecret || ""} onChange={set("twitterApiSecret")} />
@@ -170,6 +171,11 @@ export default function SettingsPage() {
         <div className="grid grid-cols-2 gap-3">
           <SecretInput label="Access Token" value={form.twitterAccessToken || ""} onChange={set("twitterAccessToken")} />
           <SecretInput label="Access Secret" value={form.twitterAccessSecret || ""} onChange={set("twitterAccessSecret")} />
+        </div>
+        <div className="text-[11px]" style={{ color: "hsl(240 5% 50%)" }}>
+          {form.twitterConnected ? "✓ Search enabled" : "○ Bearer token needed for search"}
+          {" · "}
+          {form.twitterWriteEnabled ? "✓ Posting/likes enabled" : "○ API keys + User ID needed for posting"}
         </div>
       </PlatformSection>
 

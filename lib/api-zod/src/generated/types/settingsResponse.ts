@@ -10,6 +10,9 @@ export interface SettingsResponse {
   artistName: string;
   genre: string;
   twitterConnected: boolean;
+  twitterWriteEnabled: boolean;
+  twitterUserId: string;
   engagementKeywords: string[];
   autopilotEnabled: boolean;
+  autopilotIntervalMinutes: number;
 }

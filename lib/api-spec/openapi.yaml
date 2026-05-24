@@ -602,13 +602,19 @@ components:
           type: string
         twitterConnected:
           type: boolean
+        twitterWriteEnabled:
+          type: boolean
+        twitterUserId:
+          type: string
         engagementKeywords:
           type: array
           items:
             type: string
         autopilotEnabled:
           type: boolean
-      required: [artistName, genre, twitterConnected, engagementKeywords, autopilotEnabled]
+        autopilotIntervalMinutes:
+          type: integer
+      required: [artistName, genre, twitterConnected, twitterWriteEnabled, twitterUserId, engagementKeywords, autopilotEnabled, autopilotIntervalMinutes]
     SaveSettingsRequest:
       type: object
       properties:
@@ -625,6 +631,8 @@ components:
         twitterAccessToken:
           type: string
         twitterAccessSecret:
+          type: string
+        twitterUserId:
           type: string
         engagementKeywords:
           type: array

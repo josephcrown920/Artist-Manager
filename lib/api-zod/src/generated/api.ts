@@ -307,8 +307,11 @@ export const GetSettingsResponse = zod.object({
   artistName: zod.string(),
   genre: zod.string(),
   twitterConnected: zod.boolean(),
+  twitterWriteEnabled: zod.boolean(),
+  twitterUserId: zod.string(),
   engagementKeywords: zod.array(zod.string()),
   autopilotEnabled: zod.boolean(),
+  autopilotIntervalMinutes: zod.number(),
 });
 
 /**
@@ -322,6 +325,7 @@ export const SaveSettingsBody = zod.object({
   twitterApiSecret: zod.string().optional(),
   twitterAccessToken: zod.string().optional(),
   twitterAccessSecret: zod.string().optional(),
+  twitterUserId: zod.string().optional(),
   engagementKeywords: zod.array(zod.string()).optional(),
 });
 
@@ -329,6 +333,9 @@ export const SaveSettingsResponse = zod.object({
   artistName: zod.string(),
   genre: zod.string(),
   twitterConnected: zod.boolean(),
+  twitterWriteEnabled: zod.boolean(),
+  twitterUserId: zod.string(),
   engagementKeywords: zod.array(zod.string()),
   autopilotEnabled: zod.boolean(),
+  autopilotIntervalMinutes: zod.number(),
 });

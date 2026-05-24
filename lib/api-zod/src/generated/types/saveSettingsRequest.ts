@@ -14,5 +14,6 @@ export interface SaveSettingsRequest {
   twitterApiSecret?: string;
   twitterAccessToken?: string;
   twitterAccessSecret?: string;
+  twitterUserId?: string;
   engagementKeywords?: string[];
 }

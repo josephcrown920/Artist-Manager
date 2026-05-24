@@ -96,7 +96,7 @@ router.get("/", async (req, res) => {
 
 router.post("/generate", async (req, res) => {
   try {
-    const artistName = (await getSetting("artistName")) || "the artist";
+    const artistName = (await getSetting("artist_name")) || "the artist";
     const genre = (await getSetting("genre")) || "music";
 
     const today = new Date().toISOString().split("T")[0];

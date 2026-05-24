@@ -233,8 +233,11 @@ export interface SettingsResponse {
   artistName: string;
   genre: string;
   twitterConnected: boolean;
+  twitterWriteEnabled: boolean;
+  twitterUserId: string;
   engagementKeywords: string[];
   autopilotEnabled: boolean;
+  autopilotIntervalMinutes: number;
 }
 
 export interface SaveSettingsRequest {
@@ -245,5 +248,6 @@ export interface SaveSettingsRequest {
   twitterApiSecret?: string;
   twitterAccessToken?: string;
   twitterAccessSecret?: string;
+  twitterUserId?: string;
   engagementKeywords?: string[];
 }
