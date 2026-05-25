@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState } from "react";
 import {
   LayoutDashboard, Bot, CheckSquare, Zap, Settings, BookOpen, Menu, X,
-  ChevronRight, Megaphone, TrendingUp, ListMusic,
+  Megaphone, TrendingUp, ListMusic, Sparkles,
 } from "lucide-react";
 import Dashboard from "@/pages/Dashboard";
 import Agents from "@/pages/Agents";
@@ -38,31 +38,35 @@ const NAV = [
 function Sidebar({ onClose }: { onClose?: () => void }) {
   const [location] = useLocation();
   return (
-    <div
-      className="flex flex-col h-full"
-      style={{ background: "hsl(30 10% 4%)", borderRight: "1px solid hsl(30 8% 14%)" }}
-    >
-      {/* Editorial masthead */}
-      <div className="px-5 pt-6 pb-5 border-b" style={{ borderColor: "hsl(30 8% 14%)" }}>
+    <div className="flex flex-col h-full glass-strong">
+      {/* Holographic header */}
+      <div className="px-5 pt-6 pb-5 border-b" style={{ borderColor: "hsl(280 60% 30% / 0.4)" }}>
         <div className="flex items-start justify-between">
           <Link href="/" onClick={onClose}>
             <div className="cursor-pointer">
-              <div className="eyebrow mb-1.5" style={{ color: "hsl(18 70% 60%)" }}>
-                NBA Josh · Vol. 01
+              <div className="flex items-center gap-2 mb-2">
+                <div
+                  className="w-9 h-9 rounded-2xl flex items-center justify-center glow-pink"
+                  style={{
+                    background: "linear-gradient(135deg, hsl(320 100% 62%) 0%, hsl(270 100% 65%) 100%)",
+                  }}
+                >
+                  <Sparkles size={16} className="text-white" />
+                </div>
+                <div>
+                  <div className="font-display text-lg leading-none aurora-text">AUTOPILOT</div>
+                  <div className="eyebrow mt-1" style={{ color: "hsl(180 80% 65%)" }}>
+                    NBA Josh · v2.0
+                  </div>
+                </div>
               </div>
-              <div
-                className="font-editorial text-2xl leading-none"
-                style={{ color: "hsl(36 15% 95%)", letterSpacing: "-0.02em" }}
-              >
-                The Manager
-              </div>
-              <div className="text-[11px] mt-1.5 italic" style={{ color: "hsl(30 5% 55%)" }}>
-                Autopilot for the modern artist
+              <div className="text-[11px] mt-2" style={{ color: "hsl(280 20% 70%)" }}>
+                Your AI artist management OS
               </div>
             </div>
           </Link>
           {onClose && (
-            <button onClick={onClose} className="p-1 rounded" style={{ color: "hsl(30 5% 55%)" }}>
+            <button onClick={onClose} className="p-1 rounded" style={{ color: "hsl(280 15% 65%)" }}>
               <X size={18} />
             </button>
           )}
@@ -70,23 +74,26 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {NAV.map(({ path, label, icon: Icon }) => {
           const active = path === "/" ? location === "/" : location.startsWith(path);
           return (
             <Link key={path} href={path} onClick={onClose}>
               <div
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 cursor-pointer"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 cursor-pointer relative overflow-hidden"
                 style={
                   active
                     ? {
-                        background: "hsl(18 75% 48% / 0.14)",
-                        color: "hsl(18 75% 75%)",
-                        border: "1px solid hsl(18 75% 48% / 0.28)",
+                        background:
+                          "linear-gradient(135deg, hsl(320 100% 62% / 0.25) 0%, hsl(270 100% 65% / 0.15) 100%)",
+                        color: "hsl(320 100% 85%)",
+                        border: "1px solid hsl(320 100% 62% / 0.45)",
+                        boxShadow:
+                          "inset 0 1px 0 0 hsl(320 100% 80% / 0.2), 0 0 20px -6px hsl(320 100% 50% / 0.5)",
                         fontWeight: 500,
                       }
                     : {
-                        color: "hsl(30 5% 58%)",
+                        color: "hsl(280 15% 70%)",
                         border: "1px solid transparent",
                         fontWeight: 400,
                       }
@@ -94,20 +101,36 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
               >
                 <Icon size={16} />
                 <span>{label}</span>
-                {active && <ChevronRight size={13} className="ml-auto opacity-60" />}
+                {active && (
+                  <div
+                    className="ml-auto w-1.5 h-1.5 rounded-full"
+                    style={{
+                      background: "hsl(180 100% 60%)",
+                      boxShadow: "0 0 8px hsl(180 100% 60%)",
+                    }}
+                  />
+                )}
               </div>
             </Link>
           );
         })}
       </nav>
 
-      {/* Editorial footer */}
-      <div className="px-5 py-4 border-t" style={{ borderColor: "hsl(30 8% 14%)" }}>
-        <div className="eyebrow mb-1" style={{ color: "hsl(30 5% 45%)" }}>
-          Published Daily
-        </div>
-        <div className="text-[11px] italic leading-relaxed" style={{ color: "hsl(30 5% 50%)" }}>
-          Six AI agents, one obsessed editor — pitching, pushing, producing your career.
+      {/* Footer chip */}
+      <div className="px-4 py-4 border-t" style={{ borderColor: "hsl(280 60% 30% / 0.4)" }}>
+        <div
+          className="rounded-2xl px-3 py-3 chrome-border"
+          style={{
+            background:
+              "linear-gradient(135deg, hsl(180 100% 50% / 0.08) 0%, hsl(320 100% 60% / 0.08) 100%)",
+          }}
+        >
+          <div className="eyebrow mb-1" style={{ color: "hsl(180 80% 70%)" }}>
+            SYSTEM ONLINE
+          </div>
+          <div className="text-[11px] leading-relaxed" style={{ color: "hsl(280 20% 75%)" }}>
+            6 AI agents standing by. The future of artist management.
+          </div>
         </div>
       </div>
     </div>
@@ -118,7 +141,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "hsl(30 10% 5%)" }}>
+    <div className="flex h-screen overflow-hidden">
       <div className="hidden md:flex flex-col w-64 flex-shrink-0">
         <Sidebar />
       </div>
@@ -128,21 +151,19 @@ function Layout({ children }: { children: React.ReactNode }) {
           <div className="w-72 h-full">
             <Sidebar onClose={() => setMobileOpen(false)} />
           </div>
-          <div className="flex-1 bg-black/70" onClick={() => setMobileOpen(false)} />
+          <div className="flex-1 bg-black/70 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
         </div>
       )}
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <div
-          className="flex md:hidden items-center gap-3 px-5 py-4 border-b"
-          style={{ borderColor: "hsl(30 8% 14%)", background: "hsl(30 10% 4%)" }}
+          className="flex md:hidden items-center gap-3 px-5 py-4 border-b glass"
+          style={{ borderColor: "hsl(280 60% 30% / 0.4)" }}
         >
-          <button onClick={() => setMobileOpen(true)} style={{ color: "hsl(30 5% 65%)" }}>
+          <button onClick={() => setMobileOpen(true)} style={{ color: "hsl(280 20% 80%)" }}>
             <Menu size={20} />
           </button>
-          <div className="font-editorial text-lg" style={{ color: "hsl(36 15% 95%)" }}>
-            The Manager
-          </div>
+          <div className="font-display text-lg aurora-text">AUTOPILOT</div>
         </div>
 
         <main className="flex-1 overflow-y-auto">{children}</main>

@@ -77,18 +77,19 @@ export default function Dashboard() {
 
   return (
     <div className="px-6 md:px-10 py-8 max-w-6xl mx-auto space-y-8">
-      {/* Editorial header */}
-      <div className="pb-6 border-b" style={{ borderColor: "hsl(30 8% 18%)" }}>
-        <div className="eyebrow mb-3" style={{ color: "hsl(18 70% 60%)" }}>
-          Issue No. 01 · Today's Edition
+      {/* Y2K header */}
+      <div className="pb-6">
+        <div className="eyebrow mb-3" style={{ color: "hsl(180 80% 65%)" }}>
+          ▸ COMMAND CENTER · ONLINE
         </div>
-        <h1 className="text-4xl md:text-5xl" style={{ color: "hsl(36 12% 95%)", lineHeight: 1.05 }}>
-          The Newsroom
+        <h1 className="text-5xl md:text-6xl aurora-text" style={{ lineHeight: 1 }}>
+          MISSION CONTROL
         </h1>
-        <p className="text-base mt-3 max-w-2xl" style={{ color: "hsl(30 6% 60%)", lineHeight: 1.55 }}>
-          Six editors. One artist. Everything moving at once — pitching playlists, drafting copy,
-          chasing curators, and keeping the story warm.
+        <p className="text-base mt-4 max-w-2xl" style={{ color: "hsl(280 20% 75%)", lineHeight: 1.55 }}>
+          Six AI agents, one artist, infinite moves. Pitching playlists, drafting copy, chasing
+          curators — your career, running in the background.
         </p>
+        <div className="rule mt-5" />
       </div>
 
       {/* Daily tip */}
@@ -112,8 +113,8 @@ export default function Dashboard() {
 
       {/* Agent team */}
       <div>
-        <div className="eyebrow mb-2" style={{ color: "hsl(30 5% 50%)" }}>The Masthead</div>
-        <h2 className="text-2xl mb-4" style={{ color: "hsl(36 12% 92%)" }}>Your AI Team</h2>
+        <div className="eyebrow mb-2" style={{ color: "hsl(320 80% 70%)" }}>▸ THE SQUAD</div>
+        <h2 className="text-3xl mb-4 chrome-text">Your AI Team</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {[
             { emoji: "👔", name: "Manager", desc: "Career strategy & deals", color: "hsl(18 75% 58%)" },
@@ -136,8 +137,8 @@ export default function Dashboard() {
 
       {/* Quick actions */}
       <div>
-        <div className="eyebrow mb-2" style={{ color: "hsl(30 5% 50%)" }}>The Front Page</div>
-        <h2 className="text-2xl mb-4" style={{ color: "hsl(36 12% 92%)" }}>Today's Moves</h2>
+        <div className="eyebrow mb-2" style={{ color: "hsl(180 80% 65%)" }}>▸ HOT DROPS</div>
+        <h2 className="text-3xl mb-4 chrome-text">Today's Moves</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <QuickActionCard title="Playlist Pitching" desc="Discover curators across every DSP + AI emotional-hook pitches" href="/playlists" color="hsl(18 75% 58%)" />
           <QuickActionCard title="Ad Campaign Drafts" desc="AI-generated ads for Meta, YouTube, TikTok & Spotify" href="/ads" color="hsl(0 72% 60%)" />

@@ -171,31 +171,37 @@ export default function PlaylistPitches() {
 
   return (
     <div className="px-6 md:px-10 py-8 max-w-6xl mx-auto">
-      {/* Editorial header */}
-      <div className="mb-8 pb-6 border-b" style={{ borderColor: "hsl(30 8% 18%)" }}>
-        <div className="eyebrow mb-3" style={{ color: "hsl(18 70% 60%)" }}>
-          Volume 01 · Distribution & Reach
+      {/* Y2K header */}
+      <div className="mb-8 pb-6">
+        <div className="eyebrow mb-3" style={{ color: "hsl(180 80% 65%)" }}>
+          ▸ DISTRIBUTION MODULE · ACTIVE
         </div>
         <div className="flex items-start justify-between gap-6 flex-wrap">
           <div>
-            <h1 className="text-4xl md:text-5xl mb-3" style={{ color: "hsl(36 12% 95%)", lineHeight: 1.05 }}>
-              Playlist Pitching
+            <h1 className="text-5xl md:text-6xl mb-3 aurora-text" style={{ lineHeight: 1 }}>
+              PLAYLIST OPS
             </h1>
-            <p className="text-base max-w-2xl" style={{ color: "hsl(30 6% 60%)", lineHeight: 1.55 }}>
-              Curators discovered across every DSP and submission service. Pitches written with emotional hooks
+            <p className="text-base max-w-2xl" style={{ color: "hsl(280 20% 75%)", lineHeight: 1.55 }}>
+              Curators discovered across every DSP. Pitches written with emotional hooks
               that play the listener's ears first — copy, paste, and ship.
             </p>
           </div>
           <button
             onClick={() => discoverMut.mutate()}
             disabled={discoverMut.isPending}
-            className="flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-opacity disabled:opacity-50 flex-shrink-0"
-            style={{ background: "hsl(18 75% 48%)", color: "hsl(36 15% 96%)" }}
+            className="flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold transition-all hover:scale-[1.03] disabled:opacity-50 flex-shrink-0 glow-pink"
+            style={{
+              background:
+                "linear-gradient(135deg, hsl(320 100% 62%) 0%, hsl(270 100% 65%) 100%)",
+              color: "white",
+              border: "1px solid hsl(280 100% 80% / 0.5)",
+            }}
           >
             {discoverMut.isPending ? <Loader2 size={15} className="animate-spin" /> : <Search size={15} />}
-            Discover Curators
+            DISCOVER CURATORS
           </button>
         </div>
+        <div className="rule mt-5" />
       </div>
 
       {/* Platform filter */}
