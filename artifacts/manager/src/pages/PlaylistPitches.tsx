@@ -33,16 +33,16 @@ const PLATFORM_META: Record<string, { label: string; color: string }> = {
   spotify:        { label: "Spotify",         color: "hsl(141 60% 45%)" },
   apple_music:    { label: "Apple Music",     color: "hsl(355 75% 60%)" },
   youtube_music:  { label: "YouTube Music",   color: "hsl(0 75% 55%)" },
-  audiomack:      { label: "Audiomack",       color: "hsl(45 95% 55%)" },
+  audiomack:      { label: "Audiomack",       color: "hsl(180 95% 55%)" },
   boomplay:       { label: "Boomplay",        color: "hsl(195 90% 50%)" },
   tidal:          { label: "Tidal",           color: "hsl(210 15% 60%)" },
   deezer:         { label: "Deezer",          color: "hsl(280 75% 60%)" },
   amazon_music:   { label: "Amazon Music",    color: "hsl(195 75% 50%)" },
-  submithub:      { label: "SubmitHub",       color: "hsl(18 75% 55%)" },
+  submithub:      { label: "SubmitHub",       color: "hsl(320 75% 55%)" },
   groover:        { label: "Groover",         color: "hsl(165 65% 50%)" },
-  soundplate:     { label: "Soundplate",      color: "hsl(38 75% 60%)" },
+  soundplate:     { label: "Soundplate",      color: "hsl(180 75% 60%)" },
   playlistpush:   { label: "PlaylistPush",    color: "hsl(330 70% 60%)" },
-  indie:          { label: "Indie",           color: "hsl(30 30% 70%)" },
+  indie:          { label: "Indie",           color: "hsl(280 30% 70%)" },
 };
 
 function contactIcon(m: string) {
@@ -212,14 +212,14 @@ export default function PlaylistPitches() {
             className="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
             style={
               filterPlatform === "all"
-                ? { background: "hsl(36 12% 92%)", color: "hsl(30 15% 8%)" }
-                : { border: "1px solid hsl(30 8% 22%)", color: "hsl(30 6% 65%)" }
+                ? { background: "hsl(280 12% 92%)", color: "hsl(280 15% 8%)" }
+                : { border: "1px solid hsl(280 8% 22%)", color: "hsl(280 6% 65%)" }
             }
           >
             All ({curators.length})
           </button>
           {platformsInUse.map((p) => {
-            const meta = PLATFORM_META[p] || { label: p, color: "hsl(30 30% 70%)" };
+            const meta = PLATFORM_META[p] || { label: p, color: "hsl(280 30% 70%)" };
             const count = curators.filter((c) => c.platform === p).length;
             return (
               <button
@@ -229,7 +229,7 @@ export default function PlaylistPitches() {
                 style={
                   filterPlatform === p
                     ? { background: `${meta.color.replace(")", " / 0.18)")}`, color: meta.color, border: `1px solid ${meta.color.replace(")", " / 0.4)")}` }
-                    : { border: "1px solid hsl(30 8% 22%)", color: "hsl(30 6% 65%)" }
+                    : { border: "1px solid hsl(280 8% 22%)", color: "hsl(280 6% 65%)" }
                 }
               >
                 {meta.label} ({count})
@@ -243,13 +243,13 @@ export default function PlaylistPitches() {
       {!cLoading && curators.length === 0 && !discoverMut.isPending && (
         <div
           className="rounded-2xl border p-12 text-center"
-          style={{ borderColor: "hsl(30 8% 18%)", background: "hsl(30 9% 7%)" }}
+          style={{ borderColor: "hsl(280 8% 18%)", background: "hsl(280 9% 7%)" }}
         >
-          <ListMusic size={36} className="mx-auto mb-4" style={{ color: "hsl(18 75% 50%)" }} />
-          <h2 className="text-2xl mb-2" style={{ color: "hsl(36 12% 92%)" }}>
+          <ListMusic size={36} className="mx-auto mb-4" style={{ color: "hsl(320 75% 50%)" }} />
+          <h2 className="text-2xl mb-2" style={{ color: "hsl(280 12% 92%)" }}>
             No curators yet
           </h2>
-          <p className="text-sm mb-6 max-w-md mx-auto" style={{ color: "hsl(30 6% 60%)" }}>
+          <p className="text-sm mb-6 max-w-md mx-auto" style={{ color: "hsl(280 6% 60%)" }}>
             Tap <em>Discover Curators</em> and the AI will surface 12 playlist owners across Spotify,
             Apple Music, Audiomack, SubmitHub, Groover, and indie tastemaker channels.
           </p>
@@ -257,7 +257,7 @@ export default function PlaylistPitches() {
             onClick={() => discoverMut.mutate()}
             disabled={discoverMut.isPending}
             className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium"
-            style={{ background: "hsl(18 75% 48%)", color: "hsl(36 15% 96%)" }}
+            style={{ background: "hsl(320 75% 48%)", color: "hsl(280 15% 96%)" }}
           >
             <Search size={15} /> Discover the first 12
           </button>
@@ -266,8 +266,8 @@ export default function PlaylistPitches() {
 
       {(cLoading || discoverMut.isPending) && curators.length === 0 && (
         <div className="flex flex-col items-center py-20">
-          <Loader2 size={28} className="animate-spin mb-3" style={{ color: "hsl(18 75% 50%)" }} />
-          <p className="text-sm" style={{ color: "hsl(30 6% 55%)" }}>
+          <Loader2 size={28} className="animate-spin mb-3" style={{ color: "hsl(320 75% 50%)" }} />
+          <p className="text-sm" style={{ color: "hsl(280 6% 55%)" }}>
             {discoverMut.isPending ? "AI is scouting curators…" : "Loading…"}
           </p>
         </div>
@@ -276,26 +276,26 @@ export default function PlaylistPitches() {
       {/* Curator grid */}
       <div className="grid md:grid-cols-2 gap-5">
         {filteredCurators.map((c) => {
-          const meta = PLATFORM_META[c.platform] || { label: c.platform, color: "hsl(30 30% 70%)" };
+          const meta = PLATFORM_META[c.platform] || { label: c.platform, color: "hsl(280 30% 70%)" };
           const Icon = contactIcon(c.contactMethod);
           const myDrafts = draftsByCurator.get(c.id) || [];
           return (
             <div
               key={c.id}
               className="rounded-2xl border overflow-hidden flex flex-col"
-              style={{ borderColor: "hsl(30 8% 18%)", background: "hsl(30 9% 8%)" }}
+              style={{ borderColor: "hsl(280 8% 18%)", background: "hsl(280 9% 8%)" }}
             >
-              <div className="p-5 border-b" style={{ borderColor: "hsl(30 8% 16%)" }}>
+              <div className="p-5 border-b" style={{ borderColor: "hsl(280 8% 16%)" }}>
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="min-w-0">
                     <div className="eyebrow mb-1.5" style={{ color: meta.color }}>
                       {meta.label}
                     </div>
-                    <h3 className="text-xl mb-1" style={{ color: "hsl(36 12% 94%)" }}>
+                    <h3 className="text-xl mb-1" style={{ color: "hsl(280 12% 94%)" }}>
                       {c.name}
                     </h3>
                     {c.playlistName && (
-                      <div className="text-sm italic" style={{ color: "hsl(30 6% 65%)" }}>
+                      <div className="text-sm italic" style={{ color: "hsl(280 6% 65%)" }}>
                         “{c.playlistName}”
                       </div>
                     )}
@@ -303,18 +303,18 @@ export default function PlaylistPitches() {
                   <button
                     onClick={() => deleteCurator.mutate(c.id)}
                     className="p-1.5 rounded-lg hover:bg-white/5"
-                    style={{ color: "hsl(30 5% 45%)" }}
+                    style={{ color: "hsl(280 5% 45%)" }}
                   >
                     <Trash2 size={13} />
                   </button>
                 </div>
 
-                <p className="text-sm leading-relaxed mb-3" style={{ color: "hsl(36 8% 75%)" }}>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: "hsl(280 8% 75%)" }}>
                   {c.niche}
                 </p>
 
                 {c.notes && (
-                  <p className="text-xs leading-relaxed mb-3 italic" style={{ color: "hsl(30 5% 58%)" }}>
+                  <p className="text-xs leading-relaxed mb-3 italic" style={{ color: "hsl(280 5% 58%)" }}>
                     {c.notes}
                   </p>
                 )}
@@ -322,7 +322,7 @@ export default function PlaylistPitches() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <div
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs"
-                    style={{ background: "hsl(30 8% 12%)", color: "hsl(36 8% 80%)" }}
+                    style={{ background: "hsl(280 8% 12%)", color: "hsl(280 8% 80%)" }}
                   >
                     <Icon size={12} />
                     <span className="font-mono">{c.contactValue}</span>
@@ -335,7 +335,7 @@ export default function PlaylistPitches() {
                     </button>
                   </div>
                   {c.followers && (
-                    <span className="text-xs" style={{ color: "hsl(30 5% 55%)" }}>
+                    <span className="text-xs" style={{ color: "hsl(280 5% 55%)" }}>
                       ~{c.followers.toLocaleString()} reach
                     </span>
                   )}
@@ -354,9 +354,9 @@ export default function PlaylistPitches() {
                       placeholder="Song title to pitch…"
                       className="w-full rounded-lg px-3 py-2 text-sm outline-none"
                       style={{
-                        background: "hsl(30 8% 11%)",
-                        border: "1px solid hsl(30 8% 22%)",
-                        color: "hsl(36 12% 92%)",
+                        background: "hsl(280 8% 11%)",
+                        border: "1px solid hsl(280 8% 22%)",
+                        color: "hsl(280 12% 92%)",
                       }}
                     />
                     <div className="flex gap-2">
@@ -364,7 +364,7 @@ export default function PlaylistPitches() {
                         onClick={() => generatePitch.mutate({ curatorId: c.id, songTitle })}
                         disabled={!songTitle.trim() || generatePitch.isPending}
                         className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-40"
-                        style={{ background: "hsl(18 75% 48%)", color: "hsl(36 15% 96%)" }}
+                        style={{ background: "hsl(320 75% 48%)", color: "hsl(280 15% 96%)" }}
                       >
                         {generatePitch.isPending ? (
                           <Loader2 size={14} className="animate-spin" />
@@ -376,7 +376,7 @@ export default function PlaylistPitches() {
                       <button
                         onClick={() => setPitchingCuratorId(null)}
                         className="px-3 py-2 rounded-lg text-sm"
-                        style={{ background: "hsl(30 8% 12%)", color: "hsl(30 6% 65%)" }}
+                        style={{ background: "hsl(280 8% 12%)", color: "hsl(280 6% 65%)" }}
                       >
                         Cancel
                       </button>
@@ -390,12 +390,12 @@ export default function PlaylistPitches() {
                     }}
                     className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
                     style={{
-                      background: "hsl(30 8% 12%)",
-                      border: "1px solid hsl(30 8% 20%)",
-                      color: "hsl(36 10% 85%)",
+                      background: "hsl(280 8% 12%)",
+                      border: "1px solid hsl(280 8% 20%)",
+                      color: "hsl(280 10% 85%)",
                     }}
                   >
-                    <Sparkles size={14} style={{ color: "hsl(38 75% 65%)" }} />
+                    <Sparkles size={14} style={{ color: "hsl(180 75% 65%)" }} />
                     Write pitch with emotional hook
                   </button>
                 )}
@@ -432,7 +432,7 @@ export default function PlaylistPitches() {
       {toastMsg && (
         <div
           className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full text-sm shadow-2xl"
-          style={{ background: "hsl(36 12% 92%)", color: "hsl(30 15% 8%)" }}
+          style={{ background: "hsl(280 12% 92%)", color: "hsl(280 15% 8%)" }}
         >
           {toastMsg}
         </div>
@@ -458,24 +458,24 @@ function PitchDraftCard({
   if (!v) return null;
   const hookColor =
     v.hook === "story"
-      ? "hsl(18 75% 60%)"
+      ? "hsl(320 75% 60%)"
       : v.hook === "sonic"
       ? "hsl(195 70% 60%)"
-      : "hsl(38 75% 65%)";
+      : "hsl(180 75% 65%)";
 
   const fullText = `Subject: ${v.subject}\n\n${v.body}`;
 
   return (
     <div
       className="mt-3 rounded-xl border overflow-hidden"
-      style={{ borderColor: "hsl(30 8% 18%)", background: "hsl(30 9% 6%)" }}
+      style={{ borderColor: "hsl(280 8% 18%)", background: "hsl(280 9% 6%)" }}
     >
-      <div className="px-4 py-3 border-b flex items-center justify-between gap-2" style={{ borderColor: "hsl(30 8% 14%)" }}>
+      <div className="px-4 py-3 border-b flex items-center justify-between gap-2" style={{ borderColor: "hsl(280 8% 14%)" }}>
         <div className="flex items-center gap-2 min-w-0">
           <span className="eyebrow" style={{ color: hookColor }}>
             {v.hook} hook
           </span>
-          <span className="text-xs truncate" style={{ color: "hsl(30 5% 50%)" }}>
+          <span className="text-xs truncate" style={{ color: "hsl(280 5% 50%)" }}>
             · “{draft.songTitle}”
           </span>
         </div>
@@ -500,7 +500,7 @@ function PitchDraftCard({
           <button
             onClick={onDelete}
             className="p-1 rounded hover:bg-white/5"
-            style={{ color: "hsl(30 5% 45%)" }}
+            style={{ color: "hsl(280 5% 45%)" }}
             aria-label="Delete pitch"
           >
             <X size={13} />
@@ -509,18 +509,18 @@ function PitchDraftCard({
       </div>
 
       <div className="px-4 py-3 space-y-2">
-        <div className="text-xs uppercase tracking-wider" style={{ color: "hsl(30 5% 50%)" }}>
+        <div className="text-xs uppercase tracking-wider" style={{ color: "hsl(280 5% 50%)" }}>
           Subject
         </div>
-        <div className="text-sm font-medium" style={{ color: "hsl(36 12% 92%)" }}>
+        <div className="text-sm font-medium" style={{ color: "hsl(280 12% 92%)" }}>
           {v.subject}
         </div>
-        <div className="text-xs uppercase tracking-wider mt-3" style={{ color: "hsl(30 5% 50%)" }}>
+        <div className="text-xs uppercase tracking-wider mt-3" style={{ color: "hsl(280 5% 50%)" }}>
           Body
         </div>
         <div
           className="text-sm leading-relaxed whitespace-pre-wrap p-3 rounded-lg"
-          style={{ background: "hsl(30 8% 10%)", color: "hsl(36 10% 85%)" }}
+          style={{ background: "hsl(280 8% 10%)", color: "hsl(280 10% 85%)" }}
         >
           {v.body}
         </div>
@@ -528,7 +528,7 @@ function PitchDraftCard({
           <button
             onClick={() => onCopy(fullText)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium"
-            style={{ background: "hsl(36 12% 92%)", color: "hsl(30 15% 8%)" }}
+            style={{ background: "hsl(280 12% 92%)", color: "hsl(280 15% 8%)" }}
           >
             <Copy size={12} /> Copy pitch
           </button>
@@ -540,8 +540,8 @@ function PitchDraftCard({
                 className="w-6 h-6 rounded-full text-xs font-semibold transition-all"
                 style={
                   i === draft.selectedVariationIdx
-                    ? { background: "hsl(18 75% 48%)", color: "hsl(36 15% 96%)" }
-                    : { background: "hsl(30 8% 14%)", color: "hsl(30 6% 60%)" }
+                    ? { background: "hsl(320 75% 48%)", color: "hsl(280 15% 96%)" }
+                    : { background: "hsl(280 8% 14%)", color: "hsl(280 6% 60%)" }
                 }
                 title={`${vv.hook} hook`}
               >

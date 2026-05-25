@@ -6,16 +6,16 @@ function StatCard({ icon: Icon, label, value, sub, color }: {
   icon: React.ElementType; label: string; value: string | number; sub?: string; color: string;
 }) {
   return (
-    <div className="rounded-xl p-5 border flex flex-col gap-3" style={{ background: "hsl(30 9% 8%)", borderColor: "hsl(30 8% 18%)" }}>
+    <div className="rounded-xl p-5 border flex flex-col gap-3" style={{ background: "hsl(280 9% 8%)", borderColor: "hsl(280 8% 18%)" }}>
       <div className="flex items-center justify-between">
-        <span className="text-sm" style={{ color: "hsl(30 5% 58%)" }}>{label}</span>
+        <span className="text-sm" style={{ color: "hsl(280 5% 58%)" }}>{label}</span>
         <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${color}20` }}>
           <Icon size={18} style={{ color }} />
         </div>
       </div>
       <div>
         <div className="text-2xl font-bold text-white">{value}</div>
-        {sub && <div className="text-xs mt-1" style={{ color: "hsl(30 5% 50%)" }}>{sub}</div>}
+        {sub && <div className="text-xs mt-1" style={{ color: "hsl(280 5% 50%)" }}>{sub}</div>}
       </div>
     </div>
   );
@@ -24,11 +24,11 @@ function StatCard({ icon: Icon, label, value, sub, color }: {
 function QuickActionCard({ title, desc, href, color }: { title: string; desc: string; href: string; color: string }) {
   return (
     <Link href={href}>
-      <div className="rounded-xl p-4 border cursor-pointer transition-all hover:border-opacity-60 group" style={{ background: "hsl(30 9% 8%)", borderColor: "hsl(30 8% 18%)" }}>
+      <div className="rounded-xl p-4 border cursor-pointer transition-all hover:border-opacity-60 group" style={{ background: "hsl(280 9% 8%)", borderColor: "hsl(280 8% 18%)" }}>
         <div className="flex items-center justify-between">
           <div>
             <div className="font-semibold text-sm text-white">{title}</div>
-            <div className="text-xs mt-1" style={{ color: "hsl(30 5% 50%)" }}>{desc}</div>
+            <div className="text-xs mt-1" style={{ color: "hsl(280 5% 50%)" }}>{desc}</div>
           </div>
           <ArrowRight size={16} style={{ color }} className="group-hover:translate-x-1 transition-transform" />
         </div>
@@ -93,11 +93,11 @@ export default function Dashboard() {
       </div>
 
       {/* Daily tip */}
-      <div className="rounded-xl p-4 border" style={{ background: "hsl(18 75% 48% / 0.08)", borderColor: "hsl(18 75% 48% / 0.25)" }}>
+      <div className="rounded-xl p-4 border" style={{ background: "hsl(320 75% 48% / 0.08)", borderColor: "hsl(320 75% 48% / 0.25)" }}>
         <div className="flex items-start gap-3">
-          <Star size={16} style={{ color: "hsl(38 75% 60%)" }} className="mt-0.5 flex-shrink-0" />
+          <Star size={16} style={{ color: "hsl(180 75% 60%)" }} className="mt-0.5 flex-shrink-0" />
           <div>
-            <div className="text-xs font-semibold mb-1" style={{ color: "hsl(38 75% 72%)" }}>TODAY'S INDUSTRY TIP</div>
+            <div className="text-xs font-semibold mb-1" style={{ color: "hsl(180 75% 72%)" }}>TODAY'S INDUSTRY TIP</div>
             <div className="text-sm text-white">{tip}</div>
           </div>
         </div>
@@ -117,18 +117,18 @@ export default function Dashboard() {
         <h2 className="text-3xl mb-4 chrome-text">Your AI Team</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {[
-            { emoji: "👔", name: "Manager", desc: "Career strategy & deals", color: "hsl(18 75% 58%)" },
+            { emoji: "👔", name: "Manager", desc: "Career strategy & deals", color: "hsl(320 75% 58%)" },
             { emoji: "📋", name: "Assistant", desc: "Scheduling & logistics", color: "hsl(199 89% 55%)" },
-            { emoji: "📣", name: "PR Agent", desc: "Media & press coverage", color: "hsl(38 75% 60%)" },
+            { emoji: "📣", name: "PR Agent", desc: "Media & press coverage", color: "hsl(180 75% 60%)" },
             { emoji: "📱", name: "Social Media", desc: "Content & growth", color: "hsl(142 71% 50%)" },
             { emoji: "🎵", name: "Playlister", desc: "Playlist strategy & pitching", color: "hsl(316 70% 60%)" },
             { emoji: "📢", name: "Advertiser", desc: "Paid ads & campaigns", color: "hsl(0 72% 60%)" },
           ].map(a => (
             <Link key={a.name} href="/agents">
-              <div className="rounded-xl p-4 border cursor-pointer transition-all hover:border-opacity-60" style={{ background: "hsl(30 9% 8%)", borderColor: "hsl(30 8% 18%)" }}>
+              <div className="rounded-xl p-4 border cursor-pointer transition-all hover:border-opacity-60" style={{ background: "hsl(280 9% 8%)", borderColor: "hsl(280 8% 18%)" }}>
                 <div className="text-2xl mb-2">{a.emoji}</div>
                 <div className="text-sm font-semibold text-white">{a.name}</div>
-                <div className="text-xs mt-0.5" style={{ color: "hsl(30 5% 50%)" }}>{a.desc}</div>
+                <div className="text-xs mt-0.5" style={{ color: "hsl(280 5% 50%)" }}>{a.desc}</div>
               </div>
             </Link>
           ))}
@@ -140,10 +140,10 @@ export default function Dashboard() {
         <div className="eyebrow mb-2" style={{ color: "hsl(180 80% 65%)" }}>▸ HOT DROPS</div>
         <h2 className="text-3xl mb-4 chrome-text">Today's Moves</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <QuickActionCard title="Playlist Pitching" desc="Discover curators across every DSP + AI emotional-hook pitches" href="/playlists" color="hsl(18 75% 58%)" />
+          <QuickActionCard title="Playlist Pitching" desc="Discover curators across every DSP + AI emotional-hook pitches" href="/playlists" color="hsl(320 75% 58%)" />
           <QuickActionCard title="Ad Campaign Drafts" desc="AI-generated ads for Meta, YouTube, TikTok & Spotify" href="/ads" color="hsl(0 72% 60%)" />
           <QuickActionCard title="Growth Playbooks" desc="Step-by-step strategies across every DSP" href="/growth-playbooks" color="hsl(141 73% 50%)" />
-          <QuickActionCard title="Chat with the Team" desc="Six specialized agents — manager, PR, social, more" href="/agents" color="hsl(38 75% 60%)" />
+          <QuickActionCard title="Chat with the Team" desc="Six specialized agents — manager, PR, social, more" href="/agents" color="hsl(180 75% 60%)" />
           <QuickActionCard title="Engagement Queue" desc="Find tweets to reply to & grow your following" href="/engagement" color="hsl(199 89% 55%)" />
           <QuickActionCard title="Study the Playbook" desc="Decades of artist management research" href="/knowledge" color="hsl(316 70% 60%)" />
         </div>
