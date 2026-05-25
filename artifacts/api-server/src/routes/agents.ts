@@ -10,11 +10,14 @@ import {
   ClearAgentConversationResponse,
 } from "@workspace/api-zod";
 import { eq, and } from "drizzle-orm";
+import { callAI } from "../lib/ai.js";
 
 const router: IRouter = Router();
 
-const XAI_API_URL = "https://api.x.ai/v1/chat/completions";
-const XAI_MODEL = process.env.XAI_MODEL || "grok-3-mini";
+const EMOTIONAL_HOOK_RULE = `
+=== EMOTIONAL HOOK RULE (apply to EVERY reply) ===
+Every response must lead with an EMOTIONAL HOOK that "plays the listener's ears" — meaning it makes the artist (and downstream fans/curators) feel something instantly. Hooks that work: curiosity, FOMO, identity, transformation, belonging, vindication, status. Avoid generic marketing speak. Specifics > abstractions. Stories > stats. Stakes > suggestions.
+`;
 
 const KNOWLEDGE_BASE = `
 === ARTIST MANAGEMENT MASTER KNOWLEDGE BASE ===
@@ -195,37 +198,11 @@ Your job:
 Be specific with numbers, budgets, targeting parameters, and expected results. Make advertising feel accessible even for indie artists with small budgets ($5-50/day).`,
 };
 
-async function callXAI(messages: Array<{ role: string; content: string }>, systemPrompt: string): Promise<string> {
-  const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) throw new Error("XAI_API_KEY not configured");
-
-  const response = await fetch(XAI_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: XAI_MODEL,
-      messages: [{ role: "system", content: systemPrompt }, ...messages],
-      temperature: 0.85,
-      max_tokens: 1024,
-    }),
-  });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`xAI error ${response.status}: ${err}`);
-  }
-
-  const data = await response.json() as { choices: Array<{ message: { content: string } }> };
-  return data.choices[0].message.content;
-}
-
 router.post("/chat", async (req, res) => {
   try {
     const { agentType, message } = ChatWithAgentBody.parse(req.body);
-    const systemPrompt = AGENT_PROMPTS[agentType];
+    const basePrompt = AGENT_PROMPTS[agentType];
+    const systemPrompt = `${basePrompt}\n\n${EMOTIONAL_HOOK_RULE}`;
 
     const historyRows = await db
       .select()
@@ -233,10 +210,13 @@ router.post("/chat", async (req, res) => {
       .where(eq(agentConversationsTable.agentType, agentType))
       .orderBy(agentConversationsTable.createdAt);
 
-    const historyMessages = historyRows.map((r) => ({ role: r.role, content: r.content }));
-    const allMessages = [...historyMessages, { role: "user", content: message }];
+    const historyMessages = historyRows.map((r) => ({
+      role: r.role as "user" | "assistant",
+      content: r.content,
+    }));
+    const allMessages = [...historyMessages, { role: "user" as const, content: message }];
 
-    const reply = await callXAI(allMessages, systemPrompt);
+    const reply = await callAI(allMessages, systemPrompt);
 
     await db.insert(agentConversationsTable).values({ agentType, role: "user", content: message });
     await db.insert(agentConversationsTable).values({ agentType, role: "assistant", content: reply });
@@ -298,5 +278,4 @@ router.delete("/conversations/:agentType", async (req, res) => {
   }
 });
 
-export { callXAI };
 export default router;

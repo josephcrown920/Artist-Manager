@@ -82,7 +82,11 @@ async function callAnthropic(
     content: Array<{ type: string; text?: string }>;
   };
   const block = data.content.find((b) => b.type === "text");
-  return block?.text ?? "";
+  const text = block?.text ?? "";
+  if (!text.trim()) {
+    throw new Error("Anthropic returned an empty response (no text block).");
+  }
+  return text;
 }
 
 /**

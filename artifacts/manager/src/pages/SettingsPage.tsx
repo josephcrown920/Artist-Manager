@@ -23,12 +23,12 @@ function SecretInput({ label, value, onChange, placeholder }: { label: string; v
   const [show, setShow] = useState(false);
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: "hsl(240 5% 60%)" }}>{label}</label>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: "hsl(30 5% 65%)" }}>{label}</label>
       <div className="relative">
         <input type={show ? "text" : "password"} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || "••••••••••••"}
           className="w-full rounded-lg px-3 py-2 pr-10 text-sm outline-none"
-          style={{ background: "hsl(240 8% 10%)", border: "1px solid hsl(240 5% 18%)", color: "hsl(0 0% 90%)" }} />
-        <button onClick={() => setShow(!show)} className="absolute right-2.5 top-2" style={{ color: "hsl(240 5% 45%)" }}>
+          style={{ background: "hsl(30 8% 11%)", border: "1px solid hsl(30 8% 20%)", color: "hsl(0 0% 90%)" }} />
+        <button onClick={() => setShow(!show)} className="absolute right-2.5 top-2" style={{ color: "hsl(30 5% 50%)" }}>
           {show ? <EyeOff size={15} /> : <Eye size={15} />}
         </button>
       </div>
@@ -39,10 +39,10 @@ function SecretInput({ label, value, onChange, placeholder }: { label: string; v
 function TextInput({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: "hsl(240 5% 60%)" }}>{label}</label>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: "hsl(30 5% 65%)" }}>{label}</label>
       <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
         className="w-full rounded-lg px-3 py-2 text-sm outline-none"
-        style={{ background: "hsl(240 8% 10%)", border: "1px solid hsl(240 5% 18%)", color: "hsl(0 0% 90%)" }} />
+        style={{ background: "hsl(30 8% 11%)", border: "1px solid hsl(30 8% 20%)", color: "hsl(0 0% 90%)" }} />
     </div>
   );
 }
@@ -51,18 +51,18 @@ function PlatformSection({ emoji, title, subtitle, link, linkText, children }: {
   emoji: string; title: string; subtitle: string; link?: string; linkText?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border p-5 space-y-4" style={{ background: "hsl(240 8% 7%)", borderColor: "hsl(240 5% 16%)" }}>
+    <div className="rounded-xl border p-5 space-y-4" style={{ background: "hsl(30 9% 8%)", borderColor: "hsl(30 8% 18%)" }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span className="text-xl">{emoji}</span>
           <div>
             <div className="text-sm font-semibold text-white">{title}</div>
-            <div className="text-xs" style={{ color: "hsl(240 5% 45%)" }}>{subtitle}</div>
+            <div className="text-xs" style={{ color: "hsl(30 5% 50%)" }}>{subtitle}</div>
           </div>
         </div>
         {link && (
           <a href={link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-colors"
-            style={{ color: "hsl(263 70% 65%)", background: "hsl(263 70% 58% / 0.1)" }}>
+            style={{ color: "hsl(18 75% 58%)", background: "hsl(18 75% 48% / 0.1)" }}>
             {linkText || "Setup"} <ExternalLink size={10} />
           </a>
         )}
@@ -93,14 +93,14 @@ export default function SettingsPage() {
   const set = (k: string) => (v: string) => setForm(f => ({ ...f, [k]: v }));
 
   if (isLoading) {
-    return <div className="flex justify-center pt-20"><Loader2 size={24} className="animate-spin" style={{ color: "hsl(263 70% 58%)" }} /></div>;
+    return <div className="flex justify-center pt-20"><Loader2 size={24} className="animate-spin" style={{ color: "hsl(18 75% 48%)" }} /></div>;
   }
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-5">
       <div>
         <h1 className="text-xl font-bold text-white">Settings</h1>
-        <p className="text-sm mt-0.5" style={{ color: "hsl(240 5% 50%)" }}>Configure your artist profile, platform connections & tracking</p>
+        <p className="text-sm mt-0.5" style={{ color: "hsl(30 5% 55%)" }}>Configure your artist profile, platform connections & tracking</p>
       </div>
 
       <PlatformSection emoji="🎤" title="Artist Profile" subtitle="Your core identity">
@@ -109,7 +109,7 @@ export default function SettingsPage() {
         <TextInput label="Engagement Keywords" value={form.engagementKeywords || ""} onChange={set("engagementKeywords")} placeholder="music, new artist, rapper, producer..." />
       </PlatformSection>
 
-      <div className="text-xs font-semibold uppercase tracking-wider pt-2" style={{ color: "hsl(263 70% 65%)" }}>
+      <div className="text-xs font-semibold uppercase tracking-wider pt-2" style={{ color: "hsl(18 75% 58%)" }}>
         Advertising Platforms
       </div>
 
@@ -131,7 +131,7 @@ export default function SettingsPage() {
         <SecretInput label="Refresh Token" value={form.googleAdsRefreshToken || ""} onChange={set("googleAdsRefreshToken")} />
       </PlatformSection>
 
-      <div className="text-xs font-semibold uppercase tracking-wider pt-2" style={{ color: "hsl(38 92% 55%)" }}>
+      <div className="text-xs font-semibold uppercase tracking-wider pt-2" style={{ color: "hsl(38 75% 60%)" }}>
         Music Platforms
       </div>
 
@@ -172,7 +172,7 @@ export default function SettingsPage() {
           <SecretInput label="Access Token" value={form.twitterAccessToken || ""} onChange={set("twitterAccessToken")} />
           <SecretInput label="Access Secret" value={form.twitterAccessSecret || ""} onChange={set("twitterAccessSecret")} />
         </div>
-        <div className="text-[11px]" style={{ color: "hsl(240 5% 50%)" }}>
+        <div className="text-[11px]" style={{ color: "hsl(30 5% 55%)" }}>
           {form.twitterConnected ? "✓ Search enabled" : "○ Bearer token needed for search"}
           {" · "}
           {form.twitterWriteEnabled ? "✓ Posting/likes enabled" : "○ API keys + User ID needed for posting"}
@@ -197,7 +197,7 @@ export default function SettingsPage() {
 
       <button onClick={() => saveMut.mutate(form)} disabled={saveMut.isPending}
         className="w-full py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-        style={{ background: saved ? "hsl(142 71% 45%)" : "hsl(263 70% 58%)" }}>
+        style={{ background: saved ? "hsl(142 71% 45%)" : "hsl(18 75% 48%)" }}>
         {saveMut.isPending ? <><Loader2 size={16} className="animate-spin" /> Saving...</>
           : saved ? <><CheckCircle2 size={16} /> Saved!</>
           : <><Save size={16} /> Save All Settings</>}

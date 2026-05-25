@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { adDraftsTable, appSettingsTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
-import { callXAI } from "./agents.js";
+import { callAI } from "../lib/ai.js";
 
 const router: IRouter = Router();
 
@@ -117,7 +117,7 @@ Focus on campaigns that a hip-hop/rap artist would use to:
 5. Build email list for superfans
 6. Retarget warm audiences who already engaged`;
 
-    const reply = await callXAI(
+    const reply = await callAI(
       [{ role: "user", content: userMessage }],
       AD_GENERATION_PROMPT
     );

@@ -348,8 +348,8 @@ export default function KnowledgeBase() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "hsl(263 70% 58% / 0.15)" }}>
-            <BookOpen size={20} style={{ color: "hsl(263 70% 65%)" }} />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "hsl(18 75% 48% / 0.15)" }}>
+            <BookOpen size={20} style={{ color: "hsl(18 75% 58%)" }} />
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Artist Management Playbook</h1>
@@ -358,24 +358,24 @@ export default function KnowledgeBase() {
             </div>
           </div>
         </div>
-        <p className="text-sm" style={{ color: "hsl(240 5% 48%)" }}>
+        <p className="text-sm" style={{ color: "hsl(30 5% 55%)" }}>
           Everything you need to take an artist from unknown to unstoppable — strategy, tactics, and industry secrets across {CHAPTERS.length} chapters.
         </p>
       </div>
 
       {/* Search */}
       <div className="relative mb-5">
-        <Search size={15} className="absolute left-3 top-2.5" style={{ color: "hsl(240 5% 45%)" }} />
+        <Search size={15} className="absolute left-3 top-2.5" style={{ color: "hsl(30 5% 50%)" }} />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search the playbook..."
           className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: "hsl(240 8% 7%)", border: "1px solid hsl(240 5% 16%)", color: "hsl(0 0% 90%)" }} />
+          style={{ background: "hsl(30 9% 8%)", border: "1px solid hsl(30 8% 18%)", color: "hsl(0 0% 90%)" }} />
       </div>
 
       {/* Chapters */}
       <div className="space-y-3">
         {filtered.map(chapter => (
           <div key={chapter.id} className="rounded-xl border overflow-hidden transition-all"
-            style={{ background: "hsl(240 8% 7%)", borderColor: open === chapter.id ? "hsl(263 70% 58% / 0.4)" : "hsl(240 5% 16%)" }}>
+            style={{ background: "hsl(30 9% 8%)", borderColor: open === chapter.id ? "hsl(18 75% 48% / 0.4)" : "hsl(30 8% 18%)" }}>
             {/* Chapter header */}
             <button className="w-full flex items-center justify-between px-5 py-4 text-left"
               onClick={() => setOpen(open === chapter.id ? null : chapter.id)}>
@@ -383,27 +383,27 @@ export default function KnowledgeBase() {
                 <span className="text-2xl">{chapter.emoji}</span>
                 <div>
                   <div className="text-sm font-semibold text-white">{chapter.title}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "hsl(240 5% 45%)" }}>{chapter.subtitle}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "hsl(30 5% 50%)" }}>{chapter.subtitle}</div>
                 </div>
               </div>
-              <div style={{ color: "hsl(240 5% 45%)", flexShrink: 0 }}>
+              <div style={{ color: "hsl(30 5% 50%)", flexShrink: 0 }}>
                 {open === chapter.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
               </div>
             </button>
 
             {/* Chapter content */}
             {open === chapter.id && (
-              <div className="px-5 pb-5 border-t space-y-4" style={{ borderColor: "hsl(240 5% 14%)" }}>
+              <div className="px-5 pb-5 border-t space-y-4" style={{ borderColor: "hsl(30 8% 15%)" }}>
                 {chapter.sections.map((section, si) => {
                   const key = `${chapter.id}-${si}`;
                   return (
                     <div key={si} className="pt-4">
                       <button className="flex items-center justify-between w-full mb-3 text-left"
                         onClick={() => setOpenSection(openSection === key ? null : key)}>
-                        <div className="text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(263 70% 65%)" }}>
+                        <div className="text-xs font-bold uppercase tracking-widest" style={{ color: "hsl(18 75% 58%)" }}>
                           {section.heading}
                         </div>
-                        <div style={{ color: "hsl(240 5% 40%)" }}>
+                        <div style={{ color: "hsl(30 5% 48%)" }}>
                           {openSection === key ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                         </div>
                       </button>
@@ -411,7 +411,7 @@ export default function KnowledgeBase() {
                         <ul className="space-y-2.5">
                           {section.points.filter(p => !search || p.toLowerCase().includes(search.toLowerCase())).map((point, pi) => (
                             <li key={pi} className="flex gap-2.5 text-sm" style={{ color: "hsl(0 0% 82%)", lineHeight: 1.6 }}>
-                              <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "hsl(263 70% 58%)" }} />
+                              <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "hsl(18 75% 48%)" }} />
                               {point}
                             </li>
                           ))}
@@ -427,16 +427,16 @@ export default function KnowledgeBase() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-16" style={{ color: "hsl(240 5% 40%)" }}>
+        <div className="text-center py-16" style={{ color: "hsl(30 5% 48%)" }}>
           <Search size={32} className="mx-auto mb-3 opacity-30" />
           <div className="text-sm">No results for "{search}"</div>
         </div>
       )}
 
       {/* Footer */}
-      <div className="mt-8 rounded-xl border p-5 text-center" style={{ background: "hsl(263 70% 58% / 0.06)", borderColor: "hsl(263 70% 58% / 0.2)" }}>
+      <div className="mt-8 rounded-xl border p-5 text-center" style={{ background: "hsl(18 75% 48% / 0.06)", borderColor: "hsl(18 75% 48% / 0.2)" }}>
         <div className="text-sm font-semibold text-white mb-1">Ready to apply this knowledge?</div>
-        <div className="text-xs" style={{ color: "hsl(240 5% 50%)" }}>
+        <div className="text-xs" style={{ color: "hsl(30 5% 55%)" }}>
           Ask your AI agents above — they've been trained on this entire playbook and will give you specific, actionable advice for your situation.
         </div>
       </div>

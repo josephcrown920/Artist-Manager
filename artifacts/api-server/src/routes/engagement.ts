@@ -14,7 +14,7 @@ import {
   SetAutopilotResponse,
 } from "@workspace/api-zod";
 import { eq, ne } from "drizzle-orm";
-import { callXAI } from "./agents.js";
+import { callAI } from "../lib/ai.js";
 import {
   buildOAuth1Header,
   type TwitterOAuth1Credentials,
@@ -178,7 +178,7 @@ router.post("/generate", async (req, res) => {
 
     const items = await Promise.all(
       tweets.map(async (tweet) => {
-        const reply = await callXAI(
+        const reply = await callAI(
           [
             {
               role: "user",
@@ -410,7 +410,7 @@ async function runAutopilotOnce() {
     const genre = (await getSetting("genre")) || "music";
     for (const tweet of tweets) {
       try {
-        const reply = await callXAI(
+        const reply = await callAI(
           [
             {
               role: "user",

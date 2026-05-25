@@ -3,9 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Send, Trash2, Loader2 } from "lucide-react";
 
 const AGENTS = [
-  { id: "manager", label: "Manager", emoji: "👔", color: "hsl(263 70% 65%)", desc: "Career strategy, deals & big picture" },
+  { id: "manager", label: "Manager", emoji: "👔", color: "hsl(18 75% 58%)", desc: "Career strategy, deals & big picture" },
   { id: "assistant", label: "Assistant", emoji: "📋", color: "hsl(199 89% 55%)", desc: "Scheduling, tasks & organization" },
-  { id: "pr", label: "PR Agent", emoji: "📣", color: "hsl(38 92% 55%)", desc: "Press, media & public image" },
+  { id: "pr", label: "PR Agent", emoji: "📣", color: "hsl(38 75% 60%)", desc: "Press, media & public image" },
   { id: "social", label: "Social Media", emoji: "📱", color: "hsl(142 71% 50%)", desc: "Content strategy & growth" },
   { id: "playlister", label: "Playlister", emoji: "🎵", color: "hsl(316 70% 60%)", desc: "Playlist pitching & strategy" },
   { id: "advertiser", label: "Advertiser", emoji: "📢", color: "hsl(0 72% 60%)", desc: "Paid ads & marketing campaigns" },
@@ -80,7 +80,7 @@ function ChatWindow({ agentId, agentColor }: { agentId: string; agentColor: stri
           <div className="flex flex-col items-center justify-center h-full text-center pt-12">
             <div className="text-4xl mb-3">{AGENTS.find(a => a.id === agentId)?.emoji}</div>
             <div className="text-sm font-medium text-white mb-1">Start a conversation</div>
-            <div className="text-xs" style={{ color: "hsl(240 5% 45%)" }}>{AGENTS.find(a => a.id === agentId)?.desc}</div>
+            <div className="text-xs" style={{ color: "hsl(30 5% 50%)" }}>{AGENTS.find(a => a.id === agentId)?.desc}</div>
           </div>
         ) : messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -88,14 +88,14 @@ function ChatWindow({ agentId, agentColor }: { agentId: string; agentColor: stri
               m.role === "user"
                 ? "rounded-br-sm text-white"
                 : "rounded-bl-sm border"
-            }`} style={m.role === "user" ? { background: agentColor } : { background: "hsl(240 8% 11%)", borderColor: "hsl(240 5% 18%)", color: "hsl(0 0% 87%)", whiteSpace: "pre-wrap" }}>
+            }`} style={m.role === "user" ? { background: agentColor } : { background: "hsl(30 8% 12%)", borderColor: "hsl(30 8% 20%)", color: "hsl(0 0% 87%)", whiteSpace: "pre-wrap" }}>
               {m.content}
             </div>
           </div>
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="px-4 py-3 rounded-2xl rounded-bl-sm border text-sm" style={{ background: "hsl(240 8% 11%)", borderColor: "hsl(240 5% 18%)" }}>
+            <div className="px-4 py-3 rounded-2xl rounded-bl-sm border text-sm" style={{ background: "hsl(30 8% 12%)", borderColor: "hsl(30 8% 20%)" }}>
               <div className="flex gap-1">
                 {[0,1,2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: agentColor, animationDelay: `${i*150}ms` }} />)}
               </div>
@@ -106,7 +106,7 @@ function ChatWindow({ agentId, agentColor }: { agentId: string; agentColor: stri
       </div>
 
       {/* Input */}
-      <div className="px-4 pb-4 pt-2 border-t" style={{ borderColor: "hsl(240 5% 14%)" }}>
+      <div className="px-4 pb-4 pt-2 border-t" style={{ borderColor: "hsl(30 8% 15%)" }}>
         <div className="flex gap-2">
           <textarea
             value={input}
@@ -115,7 +115,7 @@ function ChatWindow({ agentId, agentColor }: { agentId: string; agentColor: stri
             placeholder="Ask anything..."
             rows={1}
             className="flex-1 rounded-xl px-4 py-2.5 text-sm resize-none outline-none"
-            style={{ background: "hsl(240 8% 10%)", border: "1px solid hsl(240 5% 18%)", color: "hsl(0 0% 90%)", maxHeight: "120px" }}
+            style={{ background: "hsl(30 8% 11%)", border: "1px solid hsl(30 8% 20%)", color: "hsl(0 0% 90%)", maxHeight: "120px" }}
           />
           <button onClick={send} disabled={!input.trim() || isLoading}
             className="px-4 py-2 rounded-xl text-white font-medium text-sm flex items-center gap-1.5 flex-shrink-0 transition-opacity disabled:opacity-40"
@@ -141,7 +141,7 @@ export default function Agents() {
   return (
     <div className="flex flex-col md:flex-row h-full" style={{ minHeight: "calc(100vh - 57px)" }}>
       {/* Agent list */}
-      <div className="md:w-56 flex-shrink-0 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto" style={{ borderColor: "hsl(240 5% 13%)", background: "hsl(240 10% 5%)" }}>
+      <div className="md:w-56 flex-shrink-0 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto" style={{ borderColor: "hsl(30 8% 14%)", background: "hsl(30 10% 4%)" }}>
         <div className="flex md:flex-col gap-1 p-3">
           {AGENTS.map(a => (
             <button key={a.id} onClick={() => setActiveAgent(a.id)}
@@ -153,7 +153,7 @@ export default function Agents() {
               <span className="text-xl">{a.emoji}</span>
               <div className="min-w-0 hidden md:block">
                 <div className="text-xs font-semibold text-white truncate">{a.label}</div>
-                <div className="text-xs truncate" style={{ color: "hsl(240 5% 45%)" }}>{a.desc}</div>
+                <div className="text-xs truncate" style={{ color: "hsl(30 5% 50%)" }}>{a.desc}</div>
               </div>
             </button>
           ))}
@@ -163,17 +163,17 @@ export default function Agents() {
       {/* Chat area */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b" style={{ borderColor: "hsl(240 5% 13%)" }}>
+        <div className="flex items-center justify-between px-5 py-3.5 border-b" style={{ borderColor: "hsl(30 8% 14%)" }}>
           <div className="flex items-center gap-3">
             <span className="text-2xl">{agent.emoji}</span>
             <div>
               <div className="font-semibold text-sm text-white">{agent.label}</div>
-              <div className="text-xs" style={{ color: "hsl(240 5% 45%)" }}>{agent.desc}</div>
+              <div className="text-xs" style={{ color: "hsl(30 5% 50%)" }}>{agent.desc}</div>
             </div>
           </div>
           <button onClick={() => clearMut.mutate()} disabled={clearMut.isPending}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors"
-            style={{ color: "hsl(240 5% 45%)", background: "hsl(240 8% 10%)", border: "1px solid hsl(240 5% 16%)" }}>
+            style={{ color: "hsl(30 5% 50%)", background: "hsl(30 8% 11%)", border: "1px solid hsl(30 8% 18%)" }}>
             <Trash2 size={12} />
             Clear
           </button>

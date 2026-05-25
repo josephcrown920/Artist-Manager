@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { growthPlaybooksTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
-import { callXAI } from "./agents";
+import { callAI } from "../lib/ai.js";
 
 const router: IRouter = Router();
 
@@ -18,7 +18,9 @@ async function getArtistContext(): Promise<string> {
   return `Artist: ${artistName}, Genre: ${genre}`;
 }
 
-const PLAYBOOK_GENERATION_PROMPT = `You are the world's top Spotify growth strategist. Generate structured, step-by-step playbooks for growing Spotify followers.
+const PLAYBOOK_GENERATION_PROMPT = `You are the world's top multi-DSP growth strategist. Generate structured, step-by-step playbooks for growing artist followers across Spotify, Apple Music, YouTube Music, Audiomack, Boomplay, Tidal, Deezer, and Amazon Music.
+
+Every playbook must lead with an EMOTIONAL HOOK — the feeling that drives the action (FOMO, belonging, identity, transformation). Steps must be tactical, specific, and reference real platforms/tools.
 
 For each playbook, output EXACTLY this JSON format (return a JSON array of 4 objects):
 [
@@ -69,9 +71,10 @@ router.post("/generate", async (req, res) => {
     const artistContext = await getArtistContext();
     const userMessage = `${artistContext}. Generate 4 fresh Spotify follower growth playbooks — one for each category: pre-save campaigns, algorithm optimization, curator outreach, and follower engagement. Make them specific to the artist's genre.`;
 
-    const reply = await callXAI(
+    const reply = await callAI(
       [{ role: "user", content: userMessage }],
-      PLAYBOOK_GENERATION_PROMPT
+      PLAYBOOK_GENERATION_PROMPT,
+      { maxTokens: 3000 },
     );
 
     let playbooks: any[];

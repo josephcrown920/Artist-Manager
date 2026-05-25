@@ -6,9 +6,9 @@ import {
 } from "lucide-react";
 
 const CATEGORY_META: Record<string, { label: string; emoji: string; color: string; icon: React.ElementType }> = {
-  "pre-save": { label: "Pre-Save Campaigns", emoji: "🚀", color: "hsl(263 70% 65%)", icon: Music },
+  "pre-save": { label: "Pre-Save Campaigns", emoji: "🚀", color: "hsl(18 75% 58%)", icon: Music },
   "algorithm": { label: "Algorithm Optimization", emoji: "🤖", color: "hsl(199 89% 55%)", icon: Radio },
-  "curator-outreach": { label: "Curator Outreach", emoji: "🎯", color: "hsl(38 92% 55%)", icon: Users },
+  "curator-outreach": { label: "Curator Outreach", emoji: "🎯", color: "hsl(38 75% 60%)", icon: Users },
   "follower-engagement": { label: "Follower Engagement", emoji: "💜", color: "hsl(316 70% 60%)", icon: Heart },
 };
 
@@ -26,8 +26,8 @@ function PlaybookCard({ playbook, onDelete }: { playbook: Playbook; onDelete: ()
 
   return (
     <div className="rounded-xl border overflow-hidden transition-all" style={{
-      background: "hsl(240 8% 7%)",
-      borderColor: expanded ? `${meta.color.replace(")", " / 0.4)")}` : "hsl(240 5% 16%)"
+      background: "hsl(30 9% 8%)",
+      borderColor: expanded ? `${meta.color.replace(")", " / 0.4)")}` : "hsl(30 8% 18%)"
     }}>
       <button className="w-full flex items-center justify-between px-5 py-4 text-left" onClick={() => setExpanded(!expanded)}>
         <div className="flex items-center gap-3 min-w-0">
@@ -40,7 +40,7 @@ function PlaybookCard({ playbook, onDelete }: { playbook: Playbook; onDelete: ()
               <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: `${meta.color.replace(")", " / 0.12)")}`, color: meta.color }}>
                 {meta.label}
               </span>
-              <span className="text-xs" style={{ color: "hsl(240 5% 40%)" }}>
+              <span className="text-xs" style={{ color: "hsl(30 5% 48%)" }}>
                 {playbook.steps.length} steps
               </span>
             </div>
@@ -49,17 +49,17 @@ function PlaybookCard({ playbook, onDelete }: { playbook: Playbook; onDelete: ()
         <div className="flex items-center gap-2 flex-shrink-0 ml-3">
           <button onClick={(e) => { e.stopPropagation(); onDelete(); }}
             className="p-1.5 rounded-lg transition-colors hover:bg-white/5"
-            style={{ color: "hsl(240 5% 40%)" }}>
+            style={{ color: "hsl(30 5% 48%)" }}>
             <Trash2 size={13} />
           </button>
-          <div style={{ color: "hsl(240 5% 45%)" }}>
+          <div style={{ color: "hsl(30 5% 50%)" }}>
             {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </div>
         </div>
       </button>
 
       {expanded && (
-        <div className="px-5 pb-5 border-t" style={{ borderColor: "hsl(240 5% 14%)" }}>
+        <div className="px-5 pb-5 border-t" style={{ borderColor: "hsl(30 8% 15%)" }}>
           <div className="pt-4 space-y-3">
             {playbook.steps.map((step, i) => (
               <div key={i} className="flex gap-3">
@@ -125,7 +125,7 @@ export default function GrowthPlaybooks() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Spotify Growth Playbooks</h1>
-            <p className="text-xs mt-0.5" style={{ color: "hsl(240 5% 48%)" }}>
+            <p className="text-xs mt-0.5" style={{ color: "hsl(30 5% 55%)" }}>
               Step-by-step strategies to grow your Spotify followers
             </p>
           </div>
@@ -134,7 +134,7 @@ export default function GrowthPlaybooks() {
           onClick={() => generateMut.mutate()}
           disabled={generateMut.isPending}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-opacity disabled:opacity-50"
-          style={{ background: "hsl(263 70% 58%)" }}
+          style={{ background: "hsl(18 75% 48%)" }}
         >
           {generateMut.isPending ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />}
           New Strategies
@@ -150,12 +150,12 @@ export default function GrowthPlaybooks() {
             <button key={cat} onClick={() => setFilterCategory(cat)}
               className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={filterCategory === cat ? {
-                background: "hsl(263 70% 58% / 0.15)",
-                color: "hsl(263 70% 78%)",
-                border: "1px solid hsl(263 70% 58% / 0.3)",
+                background: "hsl(18 75% 48% / 0.15)",
+                color: "hsl(18 75% 70%)",
+                border: "1px solid hsl(18 75% 48% / 0.3)",
               } : {
-                color: "hsl(240 5% 50%)",
-                border: "1px solid hsl(240 5% 16%)",
+                color: "hsl(30 5% 55%)",
+                border: "1px solid hsl(30 8% 18%)",
               }}
             >
               {label} ({count})
@@ -167,14 +167,14 @@ export default function GrowthPlaybooks() {
       {(isLoading || generateMut.isPending) && playbooks.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
           <Loader2 size={28} className="animate-spin mb-3" style={{ color: "hsl(141 73% 50%)" }} />
-          <p className="text-sm" style={{ color: "hsl(240 5% 50%)" }}>
+          <p className="text-sm" style={{ color: "hsl(30 5% 55%)" }}>
             {generateMut.isPending ? "Generating growth playbooks..." : "Loading..."}
           </p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
           <TrendingUp size={32} className="mb-3" style={{ color: "hsl(240 5% 30%)" }} />
-          <p className="text-sm" style={{ color: "hsl(240 5% 50%)" }}>No playbooks in this category</p>
+          <p className="text-sm" style={{ color: "hsl(30 5% 55%)" }}>No playbooks in this category</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -189,9 +189,9 @@ export default function GrowthPlaybooks() {
       )}
 
       {generateMut.isPending && playbooks.length > 0 && (
-        <div className="flex items-center justify-center gap-2 mt-6 py-4 rounded-xl border" style={{ background: "hsl(240 8% 7%)", borderColor: "hsl(240 5% 16%)" }}>
+        <div className="flex items-center justify-center gap-2 mt-6 py-4 rounded-xl border" style={{ background: "hsl(30 9% 8%)", borderColor: "hsl(30 8% 18%)" }}>
           <Loader2 size={16} className="animate-spin" style={{ color: "hsl(141 73% 50%)" }} />
-          <span className="text-sm" style={{ color: "hsl(240 5% 50%)" }}>Generating new strategies...</span>
+          <span className="text-sm" style={{ color: "hsl(30 5% 55%)" }}>Generating new strategies...</span>
         </div>
       )}
     </div>

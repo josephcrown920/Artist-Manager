@@ -7,8 +7,41 @@ import {
 } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { callAI } from "../lib/ai.js";
+import { z } from "zod";
 
 const router: IRouter = Router();
+
+/** Robust JSON extraction — handles prefix/suffix prose around the array. */
+function extractJsonArray(raw: string): unknown {
+  const cleaned = raw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    const start = cleaned.indexOf("[");
+    const end = cleaned.lastIndexOf("]");
+    if (start !== -1 && end > start) {
+      return JSON.parse(cleaned.slice(start, end + 1));
+    }
+    throw new Error("No JSON array found in AI response");
+  }
+}
+
+const HOOK_ENUM = ["story", "sonic", "culture"] as const;
+const STATUS_ENUM = ["draft", "sent", "accepted", "rejected"] as const;
+
+const VariationSchema = z.object({
+  hook: z.enum(HOOK_ENUM),
+  subject: z.string().min(1).max(200),
+  body: z.string().min(1).max(4000),
+});
+const VariationsSchema = z.array(VariationSchema).min(1).max(3);
+
+const GenerateDraftBody = z.object({
+  curatorId: z.number().int().positive(),
+  songTitle: z.string().min(1).max(200),
+});
+const SelectBody = z.object({ variationIdx: z.number().int().min(0).max(2) });
+const StatusBody = z.object({ status: z.enum(STATUS_ENUM) });
 
 const VALID_PLATFORMS = [
   "spotify",
@@ -99,17 +132,16 @@ router.post("/discover", async (req, res) => {
       { maxTokens: 4096 },
     );
 
-    const cleaned = reply.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     let parsed: unknown;
     try {
-      parsed = JSON.parse(cleaned);
+      parsed = extractJsonArray(reply);
     } catch {
       req.log.error({ reply }, "Curator discovery: invalid JSON");
       res.status(502).json({ error: "AI returned invalid JSON. Try again." });
       return;
     }
-    if (!Array.isArray(parsed)) {
-      res.status(502).json({ error: "AI returned non-array. Try again." });
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      res.status(502).json({ error: "AI returned no curators. Try again." });
       return;
     }
 
@@ -189,13 +221,12 @@ router.get("/drafts", async (_req, res) => {
 
 router.post("/drafts/generate", async (req, res) => {
   try {
-    const body = req.body as { curatorId?: number; songTitle?: string };
-    const curatorId = Number(body?.curatorId);
-    const songTitle = String(body?.songTitle ?? "").trim();
-    if (!curatorId || !songTitle) {
+    const parsed = GenerateDraftBody.safeParse(req.body);
+    if (!parsed.success) {
       res.status(400).json({ error: "curatorId and songTitle are required" });
       return;
     }
+    const { curatorId, songTitle } = parsed.data;
 
     const [curator] = await db
       .select()
@@ -219,18 +250,20 @@ Write 3 pitch variations using STORY, SONIC, and CULTURE emotional hooks. Each m
       PITCH_VARIATIONS_SYSTEM,
       { maxTokens: 2048 },
     );
-    const cleaned = reply.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-    let variations: unknown;
+    let rawVariations: unknown;
     try {
-      variations = JSON.parse(cleaned);
+      rawVariations = extractJsonArray(reply);
     } catch {
       res.status(502).json({ error: "AI returned invalid JSON. Try again." });
       return;
     }
-    if (!Array.isArray(variations) || variations.length === 0) {
-      res.status(502).json({ error: "AI returned no variations. Try again." });
+    const variationCheck = VariationsSchema.safeParse(rawVariations);
+    if (!variationCheck.success) {
+      req.log.error({ raw: rawVariations, issues: variationCheck.error.issues }, "Bad variations");
+      res.status(502).json({ error: "AI returned malformed variations. Try again." });
       return;
     }
+    const variations = variationCheck.data;
 
     const [draft] = await db
       .insert(pitchDraftsTable)
@@ -262,14 +295,18 @@ Write 3 pitch variations using STORY, SONIC, and CULTURE emotional hooks. Each m
 router.post("/drafts/:id/select", async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const idx = Number((req.body as { variationIdx?: number })?.variationIdx ?? 0);
     if (Number.isNaN(id)) {
       res.status(400).json({ error: "Invalid id" });
       return;
     }
+    const parsed = SelectBody.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "variationIdx must be 0-2" });
+      return;
+    }
     await db
       .update(pitchDraftsTable)
-      .set({ selectedVariationIdx: idx })
+      .set({ selectedVariationIdx: parsed.data.variationIdx })
       .where(eq(pitchDraftsTable.id, id));
     res.json({ success: true });
   } catch (err) {
@@ -280,11 +317,16 @@ router.post("/drafts/:id/select", async (req, res) => {
 router.post("/drafts/:id/status", async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const status = String((req.body as { status?: string })?.status ?? "").trim();
-    if (!["draft", "sent", "accepted", "rejected"].includes(status)) {
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: "Invalid id" });
+      return;
+    }
+    const parsed = StatusBody.safeParse(req.body);
+    if (!parsed.success) {
       res.status(400).json({ error: "Invalid status" });
       return;
     }
+    const status = parsed.data.status;
     const update: { status: string; sentAt?: Date } = { status };
     if (status === "sent") update.sentAt = new Date();
     await db.update(pitchDraftsTable).set(update).where(eq(pitchDraftsTable.id, id));
