@@ -139,9 +139,15 @@ export default function Agents() {
   });
 
   return (
-    <div className="flex flex-col md:flex-row h-full" style={{ minHeight: "calc(100vh - 57px)" }}>
+    <div className="flex flex-col h-full" style={{ minHeight: "calc(100vh - 57px)" }}>
+      {/* Y2K page header */}
+      <div className="px-6 md:px-10 py-6 border-b" style={{ borderColor: "hsl(280 60% 25% / 0.4)" }}>
+        <div className="eyebrow mb-2" style={{ color: "hsl(180 80% 65%)" }}>▸ AI TEAM · STANDING BY</div>
+        <h1 className="text-3xl aurora-text" style={{ lineHeight: 1 }}>AI AGENTS</h1>
+      </div>
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
       {/* Agent list */}
-      <div className="md:w-56 flex-shrink-0 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto" style={{ borderColor: "hsl(280 8% 14%)", background: "hsl(280 10% 4%)" }}>
+      <div className="md:w-56 flex-shrink-0 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto" style={{ borderColor: "hsl(280 60% 22% / 0.4)", background: "hsl(280 45% 5%)" }}>
         <div className="flex md:flex-col gap-1 p-3">
           {AGENTS.map(a => (
             <button key={a.id} onClick={() => setActiveAgent(a.id)}
@@ -181,6 +187,7 @@ export default function Agents() {
         <div className="flex-1 min-h-0">
           <ChatWindow key={activeAgent} agentId={activeAgent} agentColor={agent.color} />
         </div>
+      </div>
       </div>
     </div>
   );

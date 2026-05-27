@@ -157,12 +157,15 @@ export default function AdCampaigns() {
   const olderDrafts = drafts.filter(d => d.generatedDate !== today);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-5">
-      <div>
-        <h1 className="text-xl font-bold text-white">Ad Campaign Drafts</h1>
-        <p className="text-sm mt-0.5" style={{ color: "hsl(280 5% 55%)" }}>
-          AI-generated campaigns optimized for maximum reach at lowest CPM/CPC — just add your creatives
+    <div className="p-6 md:p-10 max-w-3xl mx-auto space-y-6">
+      {/* Y2K header */}
+      <div className="pb-4">
+        <div className="eyebrow mb-3" style={{ color: "hsl(180 80% 65%)" }}>▸ AD ENGINE · LOADED</div>
+        <h1 className="text-4xl md:text-5xl aurora-text" style={{ lineHeight: 1 }}>AD CAMPAIGNS</h1>
+        <p className="text-sm mt-3 max-w-xl" style={{ color: "hsl(280 20% 70%)" }}>
+          AI-generated campaigns optimized for maximum reach at lowest CPM/CPC — just add your creatives.
         </p>
+        <div className="rule mt-4" />
       </div>
 
       {/* Generate */}

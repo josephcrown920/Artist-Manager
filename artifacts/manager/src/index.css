@@ -57,6 +57,8 @@
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
   --font-sans: var(--app-font-sans);
+  --font-display: var(--app-font-display);
+  --font-mono: var(--app-font-mono);
   --font-serif: var(--app-font-serif);
   --font-mono: var(--app-font-mono);
 

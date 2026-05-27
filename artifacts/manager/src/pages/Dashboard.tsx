@@ -106,7 +106,7 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={CheckSquare} label="Open Tasks" value={openTasks} sub="across all priorities" color="hsl(263, 70%, 65%)" />
-        <StatCard icon={Zap} label="Posted Today" value={postedToday} sub="Twitter engagements" color="hsl(38, 92%, 55%)" />
+        <StatCard icon={Zap} label="Posted Today" value={postedToday} sub="Twitter engagements" color="hsl(180, 92%, 55%)" />
         <StatCard icon={Bot} label="AI Agents" value={6} sub="Manager, PR, Social + more" color="hsl(142, 71%, 50%)" />
         <StatCard icon={TrendingUp} label="Autopilot" value={autopilot?.enabled ? "ON" : "OFF"} sub="engagement engine" color={autopilot?.enabled ? "hsl(142, 71%, 50%)" : "hsl(240, 5%, 45%)"} />
       </div>

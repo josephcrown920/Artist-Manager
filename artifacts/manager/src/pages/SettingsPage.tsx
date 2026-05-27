@@ -97,10 +97,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto space-y-5">
-      <div>
-        <h1 className="text-xl font-bold text-white">Settings</h1>
-        <p className="text-sm mt-0.5" style={{ color: "hsl(280 5% 55%)" }}>Configure your artist profile, platform connections & tracking</p>
+    <div className="p-6 md:p-10 max-w-2xl mx-auto space-y-6">
+      {/* Y2K header */}
+      <div className="pb-4">
+        <div className="eyebrow mb-3" style={{ color: "hsl(180 80% 65%)" }}>▸ SYSTEM CONFIG · SECURE</div>
+        <h1 className="text-4xl aurora-text" style={{ lineHeight: 1 }}>SETTINGS</h1>
+        <p className="text-sm mt-3" style={{ color: "hsl(280 20% 70%)" }}>
+          Artist profile, platform connections & tracking pixels — all in one place.
+        </p>
+        <div className="rule mt-4" />
       </div>
 
       <PlatformSection emoji="🎤" title="Artist Profile" subtitle="Your core identity">
