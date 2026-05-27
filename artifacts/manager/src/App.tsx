@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState } from "react";
 import {
   LayoutDashboard, Bot, CheckSquare, Zap, Settings, BookOpen, Menu, X,
-  Megaphone, TrendingUp, ListMusic, Sparkles,
+  Megaphone, TrendingUp, ListMusic, Sparkles, Youtube,
 } from "lucide-react";
 import Dashboard from "@/pages/Dashboard";
 import Agents from "@/pages/Agents";
@@ -16,6 +16,7 @@ import SettingsPage from "@/pages/SettingsPage";
 import KnowledgeBase from "@/pages/KnowledgeBase";
 import GrowthPlaybooks from "@/pages/GrowthPlaybooks";
 import PlaylistPitches from "@/pages/PlaylistPitches";
+import YouTubeGrowth from "@/pages/YouTubeGrowth";
 import NotFound from "@/pages/not-found";
 import ChatbotWidget from "@/components/ChatbotWidget";
 
@@ -29,6 +30,7 @@ const NAV = [
   { path: "/agents", label: "AI Agents", icon: Bot },
   { path: "/ads", label: "Ad Campaigns", icon: Megaphone },
   { path: "/growth-playbooks", label: "Growth Playbooks", icon: TrendingUp },
+  { path: "/youtube", label: "Shorts Growth", icon: Youtube },
   { path: "/tasks", label: "Tasks", icon: CheckSquare },
   { path: "/engagement", label: "Engagement", icon: Zap },
   { path: "/knowledge", label: "Knowledge Base", icon: BookOpen },
@@ -183,6 +185,7 @@ function Router() {
         <Route path="/agents" component={Agents} />
         <Route path="/ads" component={AdCampaigns} />
         <Route path="/growth-playbooks" component={GrowthPlaybooks} />
+        <Route path="/youtube" component={YouTubeGrowth} />
         <Route path="/tasks" component={Tasks} />
         <Route path="/engagement" component={Engagement} />
         <Route path="/knowledge" component={KnowledgeBase} />

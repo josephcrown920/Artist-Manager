@@ -8,6 +8,7 @@ import settingsRouter from "./manager-settings";
 import adDraftsRouter from "./ad-drafts";
 import growthPlaybooksRouter from "./growth-playbooks";
 import playlistPitchesRouter from "./playlist-pitches";
+import youtubeGrowthRouter from "./youtube-growth";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use("/settings", settingsRouter);
 router.use("/ad-drafts", adDraftsRouter);
 router.use("/growth-playbooks", growthPlaybooksRouter);
 router.use("/playlists", playlistPitchesRouter);
+router.use("/youtube-growth", youtubeGrowthRouter);
 
 export default router;
