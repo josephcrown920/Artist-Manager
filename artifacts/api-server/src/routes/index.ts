@@ -12,6 +12,7 @@ import youtubeGrowthRouter from "./youtube-growth";
 import spotifyCapiRouter from "./spotify-capi";
 import creatorsRouter from "./creators";
 import creatorFactoryRouter from "./creator-factory";
+import videoGenRouter from "./video-gen";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use("/youtube-growth", youtubeGrowthRouter);
 router.use("/spotify-capi", spotifyCapiRouter);
 router.use("/creators", creatorsRouter);
 router.use("/creator-factory", creatorFactoryRouter);
+router.use("/video-gen", videoGenRouter);
 
 export default router;

@@ -44,6 +44,7 @@ interface Settings {
   spotifyCapiToken?: string; spotifyCapiConnectionId?: string;
   youtubeChannelId?: string; youtubeApiKey?: string;
   tiktokShopId?: string;
+  klingApiKey?: string; klingApiSecret?: string; falApiKey?: string;
   metaPixelId?: string; tiktokPixelId?: string; googleAnalyticsId?: string;
   [key: string]: any;
 }
@@ -239,6 +240,21 @@ export default function SettingsPage() {
       <PlatformSection emoji="🛍️" title="TikTok Shop" subtitle="TikTok Shop seller account"
         link="https://seller.tiktok.com" linkText="TikTok Seller Center">
         <TextInput label="TikTok Shop ID" value={form.tiktokShopId || ""} onChange={set("tiktokShopId")} placeholder="Your shop ID" />
+      </PlatformSection>
+
+      <div className="text-xs font-semibold uppercase tracking-wider pt-2" style={{ color: "hsl(270 100% 72%)" }}>
+        Video Generation
+      </div>
+
+      <PlatformSection emoji="🎬" title="Kling AI" subtitle="Text-to-video generation"
+        link="https://platform.klingai.com" linkText="Kling Console">
+        <SecretInput label="Kling API Key" value={form.klingApiKey || ""} onChange={set("klingApiKey")} placeholder="Your Kling API Key" />
+        <SecretInput label="Kling API Secret" value={form.klingApiSecret || ""} onChange={set("klingApiSecret")} placeholder="Your Kling API Secret" />
+      </PlatformSection>
+
+      <PlatformSection emoji="🌊" title="Seedance (via fal.ai)" subtitle="ByteDance video model — enter your fal.ai key"
+        link="https://fal.ai" linkText="fal.ai Console">
+        <SecretInput label="fal.ai API Key" value={form.falApiKey || ""} onChange={set("falApiKey")} placeholder="fal_..." />
       </PlatformSection>
 
       <PlatformSection emoji="📊" title="Tracking Pixels & Analytics" subtitle="Measure conversions across platforms">

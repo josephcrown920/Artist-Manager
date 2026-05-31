@@ -43,10 +43,10 @@ async function resolveProvider(): Promise<AIProvider> {
   ) {
     return explicit as AIProvider;
   }
-  if (process.env.ANTHROPIC_API_KEY)  return "anthropic";
-  if (process.env.GEMINI_API_KEY)     return "gemini";
-  if (process.env.OPENROUTER_API_KEY) return "openrouter";
-  if (process.env.XAI_API_KEY)        return "xai";
+  if (process.env.ANTHROPIC_API_KEY)    return "anthropic";
+  if (process.env.XAI_API_KEY)          return "xai";
+  if (process.env.OPENROUTER_API_KEY)   return "openrouter";
+  if (process.env.GEMINI_API_KEY)       return "gemini";
   if (process.env.INFERENCE_SH_API_KEY) return "inference";
   throw new Error(
     "No AI provider configured. Add ANTHROPIC_API_KEY, GEMINI_API_KEY, OPENROUTER_API_KEY, or XAI_API_KEY to secrets.",
