@@ -9,6 +9,8 @@ import adDraftsRouter from "./ad-drafts";
 import growthPlaybooksRouter from "./growth-playbooks";
 import playlistPitchesRouter from "./playlist-pitches";
 import youtubeGrowthRouter from "./youtube-growth";
+import spotifyCapiRouter from "./spotify-capi";
+import creatorsRouter from "./creators";
 
 const router: IRouter = Router();
 
@@ -22,5 +24,7 @@ router.use("/ad-drafts", adDraftsRouter);
 router.use("/growth-playbooks", growthPlaybooksRouter);
 router.use("/playlists", playlistPitchesRouter);
 router.use("/youtube-growth", youtubeGrowthRouter);
+router.use("/spotify-capi", spotifyCapiRouter);
+router.use("/creators", creatorsRouter);
 
 export default router;

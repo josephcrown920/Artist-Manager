@@ -6,3 +6,4 @@ export * from "./settings";
 export * from "./ad-drafts";
 export * from "./growth-playbooks";
 export * from "./playlist-pitches";
+export * from "./creators";

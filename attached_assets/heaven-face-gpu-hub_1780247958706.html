@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HeavenFace GPU + AI Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080a0f; --s1: #0e1118; --s2: #141820; --s3: #1b2030;
+  --border: #1e2535; --border2: #283045;
+  --text: #dde3f0; --muted: #586278; --dim: #3a4258;
+  --green: #00ff88; --purple: #a855f7; --cyan: #22d3ee; --amber: #fbbf24;
+  --red: #f87171; --blue: #60a5fa; --pink: #f472b6;
+  --openai: #10a37f; --anthropic: #d97706; --google: #4285f4; --mistral: #f97316;
+  --cohere: #39d353; --together: #8b5cf6;
+}
+body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+.scanline { position: fixed; top: -2px; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--green), transparent); animation: scan 5s linear infinite; opacity: 0.3; z-index: 1; pointer-events: none; }
+@keyframes scan { 0%{top:-2px} 100%{top:100vh} }
+.container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 5rem; position: relative; z-index: 2; }
+header { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.hf-logo { width: 44px; height: 44px; background: linear-gradient(135deg, var(--purple), var(--green)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: #fff; flex-shrink: 0; letter-spacing: -0.05em; }
+.header-text h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.03em; }
+.header-text .sub { font-size: 0.72rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
+.live-pill { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--green); border: 1px solid rgba(0,255,136,0.25); padding: 4px 10px; border-radius: 20px; }
+.live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: blink 1.6s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,136,0.4)} 50%{opacity:0.5;box-shadow:0 0 0 5px rgba(0,255,136,0)} }
+.tabs { display: flex; gap: 4px; margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
+.tab { padding: 10px 18px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: none; background: none; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; font-family: 'Syne', sans-serif; letter-spacing: -0.01em; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--green); border-bottom-color: var(--green); }
+.slabel { font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.8rem; }
+.platform-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.75rem; }
+.pcard { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 0.95rem 1rem; cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden; }
+.pcard::after { content:''; position: absolute; top:0; left:0; right:0; height:2px; opacity:0; transition: opacity 0.15s; }
+.pcard.modal::after { background: var(--green); }
+.pcard.runpod::after { background: var(--purple); }
+.pcard.replit::after { background: var(--amber); }
+.pcard.colab::after { background: var(--blue); }
+.pcard:hover { border-color: var(--border2); transform: translateY(-1px); }
+.pcard.active { background: var(--s2); border-color: var(--border2); }
+.pcard.active::after { opacity: 1; }
+.pcard-name { font-size: 0.88rem; font-weight: 700; margin-bottom: 3px; }
+.pcard.modal .pcard-name { color: var(--green); }
+.pcard.runpod .pcard-name { color: var(--purple); }
+.pcard.replit .pcard-name { color: var(--amber); }
+.pcard.colab .pcard-name { color: var(--blue); }
+.pcard-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
+.ptag { display: inline-block; font-size: 0.62rem; font-family: 'JetBrains Mono', monospace; padding: 2px 7px; border-radius: 4px; border: 1px solid; }
+.pcard.modal .ptag { color: var(--green); border-color: rgba(0,255,136,0.25); background: rgba(0,255,136,0.05); }
+.pcard.runpod .ptag { color: var(--purple); border-color: rgba(168,85,247,0.25); background: rgba(168,85,247,0.05); }
+.pcard.replit .ptag { color: var(--amber); border-color: rgba(251,191,36,0.25); background: rgba(251,191,36,0.05); }
+.pcard.colab .ptag { color: var(--blue); border-color: rgba(96,165,250,0.25); background: rgba(96,165,250,0.05); }
+.config { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.row2:last-child { margin-bottom: 0; }
+.field label { display: block; font-size: 0.67rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.field select, .field input, .field textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; padding: 8px 10px; outline: none; transition: border-color 0.15s; appearance: none; }
+.field select:focus, .field input:focus, .field textarea:focus { border-color: var(--green); }
+.field textarea { min-height: 76px; resize: vertical; line-height: 1.6; }
+.provider-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.provider-card { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+.provider-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.provider-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+.p-openai .provider-icon { background: rgba(16,163,127,0.12); color: var(--openai); }
+.p-anthropic .provider-icon { background: rgba(217,119,6,0.12); color: var(--anthropic); }
+.p-google .provider-icon { background: rgba(66,133,244,0.12); color: var(--google); }
+.p-mistral .provider-icon { background: rgba(249,115,22,0.12); color: var(--mistral); }
+.p-cohere .provider-icon { background: rgba(57,211,83,0.12); color: var(--cohere); }
+.p-together .provider-icon { background: rgba(139,92,246,0.12); color: var(--together); }
+.provider-name { font-size: 0.88rem; font-weight: 700; }
+.provider-status { margin-left: auto; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.status-active { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-fallback { background: var(--amber); }
+.status-off { background: var(--dim); }
+.provider-model { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; padding: 6px 8px; outline: none; appearance: none; margin-bottom: 8px; transition: border-color 0.15s; }
+.provider-model:focus { border-color: var(--cyan); }
+.provider-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.toggle-btn { display: flex; align-items: center; gap: 6px; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; padding: 3px 9px; border-radius: 5px; border: 1px solid var(--border2); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.toggle-btn:hover { border-color: var(--green); color: var(--green); }
+.toggle-btn.active-btn { border-color: rgba(0,255,136,0.3); color: var(--green); background: rgba(0,255,136,0.06); }
+.priority-badge { font-size: 0.62rem; font-family: 'JetBrains Mono', monospace; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.p1 { background: rgba(0,255,136,0.1); color: var(--green); border: 1px solid rgba(0,255,136,0.2); }
+.p2 { background: rgba(251,191,36,0.1); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+.p3 { background: rgba(96,165,250,0.1); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+.poff { background: rgba(58,66,88,0.3); color: var(--dim); border: 1px solid var(--border); }
+.fallback-config { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; }
+.fb-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.fb-field label { display: block; font-size: 0.67rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.fb-field select, .fb-field input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; padding: 8px 10px; outline: none; appearance: none; transition: border-color 0.15s; }
+.fb-field select:focus, .fb-field input:focus { border-color: var(--cyan); }
+.gen-btn { width: 100%; background: var(--green); color: #000; border: none; border-radius: 8px; padding: 13px; font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; letter-spacing: -0.01em; margin-bottom: 1.5rem; }
+.gen-btn:hover { background: #33ffaa; transform: translateY(-1px); }
+.gen-btn2 { background: var(--s2); color: var(--cyan); border: 1px solid rgba(34,211,238,0.2); }
+.gen-btn2:hover { background: var(--s3); color: #fff; transform: translateY(-1px); }
+.output { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: none; margin-bottom: 1.5rem; }
+.output.show { display: block; }
+.out-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--s2); border-bottom: 1px solid var(--border); gap: 8px; flex-wrap: wrap; }
+.out-filename { font-family: 'JetBrains Mono', monospace; font-size: 0.73rem; color: var(--cyan); }
+.out-tabs { display: flex; gap: 4px; }
+.out-tab { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; padding: 3px 9px; border-radius: 4px; border: 1px solid var(--border2); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.12s; }
+.out-tab.active { border-color: var(--cyan); color: var(--cyan); background: rgba(34,211,238,0.06); }
+.copy-btn { background: transparent; border: 1px solid var(--border2); border-radius: 5px; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; padding: 4px 10px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.copy-btn:hover { border-color: var(--green); color: var(--green); }
+pre { padding: 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.73rem; line-height: 1.75; overflow-x: auto; white-space: pre; tab-size: 2; }
+.kw{color:#a78bfa}.str{color:#fbbf24}.cm{color:#3a4258}.fn{color:#22d3ee}.num{color:#4ade80}
+.info-bar { display: flex; flex-wrap: wrap; gap: 16px; padding: 10px 14px; background: var(--s2); border-top: 1px solid var(--border); }
+.info-item { font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+.info-item span { color: var(--green); }
+.steps-panel { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: none; }
+.steps-panel.show { display: block; }
+.steps-head { padding: 10px 14px; background: var(--s2); border-bottom: 1px solid var(--border); font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.steps-list { padding: 1rem 1.25rem; list-style: none; counter-reset: s; }
+.steps-list li { counter-increment: s; display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+.steps-list li:last-child { border-bottom: none; }
+.steps-list li::before { content: "0" counter(s); font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+.steps-list a { color: var(--cyan); text-decoration: none; }
+code { background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.18); border-radius: 3px; padding: 1px 5px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--green); }
+.flow-visual { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; }
+.flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.flow-node { display: flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 6px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; border: 1px solid; }
+.flow-node.primary { border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.06); color: var(--green); }
+.flow-node.fb1 { border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.06); color: var(--amber); }
+.flow-node.fb2 { border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.06); color: var(--blue); }
+.flow-node.fb3 { border-color: rgba(244,114,182,0.3); background: rgba(244,114,182,0.06); color: var(--pink); }
+.flow-arrow { color: var(--dim); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; flex-shrink: 0; }
+.flow-label { font-size: 0.65rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+@media (max-width: 640px) {
+  .platform-grid { grid-template-columns: 1fr 1fr; }
+  .provider-grid { grid-template-columns: 1fr; }
+  .row2, .fb-row { grid-template-columns: 1fr; }
+  .tab { padding: 8px 10px; font-size: 0.72rem; }
+}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<header>
+  <div class="hf-logo">HF</div>
+  <div class="header-text">
+    <h1>HeavenFace GPU + AI Hub</h1>
+    <div class="sub">// gpu_launcher &middot; ai_providers &middot; fallback_router</div>
+  </div>
+  <div class="live-pill"><div class="live-dot"></div>READY</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('gpu',this)">&#9889; GPU Launcher</button>
+  <button class="tab" onclick="switchTab('ai',this)">&#129302; AI Providers</button>
+  <button class="tab" onclick="switchTab('hub',this)">&#128256; Full Hub Code</button>
+</div>
+
+<!-- GPU TAB -->
+<div class="tab-content active" id="tab-gpu">
+  <div class="slabel">01 &mdash; Select GPU platform</div>
+  <div class="platform-grid">
+    <div class="pcard modal active" onclick="selectPlatform('modal',this)">
+      <div class="pcard-name">Modal.com</div>
+      <div class="pcard-desc">Serverless GPU. Pay per second. A100/H100 via fetch().</div>
+      <div class="ptag">A100 / H100</div>
+    </div>
+    <div class="pcard runpod" onclick="selectPlatform('runpod',this)">
+      <div class="pcard-name">RunPod</div>
+      <div class="pcard-desc">Deploy pod as REST endpoint. Any GPU tier.</div>
+      <div class="ptag">Serverless API</div>
+    </div>
+    <div class="pcard replit" onclick="selectPlatform('replit',this)">
+      <div class="pcard-name">Replit GPU</div>
+      <div class="pcard-desc">Native T4 inside your Replit workspace.</div>
+      <div class="ptag">T4 &middot; Native</div>
+    </div>
+    <div class="pcard colab" onclick="selectPlatform('colab',this)">
+      <div class="pcard-name">Google Colab</div>
+      <div class="pcard-desc">Free T4 notebook, exposed via ngrok tunnel.</div>
+      <div class="ptag">Free GPU</div>
+    </div>
+  </div>
+
+  <div class="slabel">02 &mdash; Configure job</div>
+  <div class="config">
+    <div class="row2">
+      <div class="field">
+        <label>Workload type</label>
+        <select id="workload">
+          <option value="inference">Model inference (LLM)</option>
+          <option value="diffusion">Image generation (Diffusion)</option>
+          <option value="training">Fine-tuning / training</option>
+          <option value="embedding">Embeddings batch</option>
+          <option value="custom">Custom Python script</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>GPU tier</label>
+        <select id="gpu">
+          <option value="T4">NVIDIA T4 (16 GB)</option>
+          <option value="A10G">NVIDIA A10G (24 GB)</option>
+          <option value="A100">NVIDIA A100 (40 GB)</option>
+          <option value="H100">NVIDIA H100 (80 GB)</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Model / script</label>
+        <input type="text" id="modelname" value="mistralai/Mistral-7B-v0.1" />
+      </div>
+      <div class="field">
+        <label>Memory (GB)</label>
+        <input type="number" id="memory" value="16" min="4" max="80" />
+      </div>
+    </div>
+    <div class="row2" style="grid-template-columns:1fr">
+      <div class="field">
+        <label>Input prompt / payload</label>
+        <textarea id="payload">Explain how neural networks work in simple terms.</textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="gen-btn" onclick="generateGPU()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Generate GPU launch code
+  </button>
+
+  <div class="output" id="gpuOutput">
+    <div class="out-header">
+      <div class="out-filename" id="gpuFilename">modal_gpu_job.py</div>
+      <button class="copy-btn" id="gpuCopyBtn" onclick="copyCode('gpuCode','gpuCopyBtn')">Copy</button>
+    </div>
+    <pre id="gpuCode"></pre>
+    <div class="info-bar" id="gpuInfo"></div>
+  </div>
+
+  <div class="steps-panel" id="gpuSteps">
+    <div class="steps-head">03 &mdash; Deploy steps</div>
+    <ul class="steps-list" id="gpuStepsList"></ul>
+  </div>
+</div>
+
+<!-- AI PROVIDERS TAB -->
+<div class="tab-content" id="tab-ai">
+  <div class="slabel">Configure AI providers + fallback chain</div>
+  <div class="provider-grid">
+    <div class="provider-card p-openai" id="prov-openai">
+      <div class="provider-header">
+        <div class="provider-icon">OAI</div>
+        <div class="provider-name">OpenAI</div>
+        <div class="provider-status status-active"></div>
+      </div>
+      <select class="provider-model" id="model-openai">
+        <option value="gpt-4o">gpt-4o</option>
+        <option value="gpt-4o-mini">gpt-4o-mini</option>
+        <option value="gpt-4-turbo">gpt-4-turbo</option>
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+      </select>
+      <div class="provider-controls">
+        <span class="priority-badge p1" id="badge-openai">PRIMARY</span>
+        <button class="toggle-btn" onclick="movePriority('openai',-1)">&#8593; Up</button>
+        <button class="toggle-btn" onclick="movePriority('openai',1)">&#8595; Down</button>
+        <button class="toggle-btn" onclick="toggleProvider('openai')" id="togbtn-openai">Disable</button>
+      </div>
+    </div>
+
+    <div class="provider-card p-anthropic" id="prov-anthropic">
+      <div class="provider-header">
+        <div class="provider-icon">ANT</div>
+        <div class="provider-name">Anthropic</div>
+        <div class="provider-status status-fallback"></div>
+      </div>
+      <select class="provider-model" id="model-anthropic">
+        <option value="claude-opus-4-6">claude-opus-4-6</option>
+        <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+        <option value="claude-haiku-4-5-20251001">claude-haiku-4-5</option>
+      </select>
+      <div class="provider-controls">
+        <span class="priority-badge p2" id="badge-anthropic">FALLBACK 1</span>
+        <button class="toggle-btn" onclick="movePriority('anthropic',-1)">&#8593; Up</button>
+        <button class="toggle-btn" onclick="movePriority('anthropic',1)">&#8595; Down</button>
+        <button class="toggle-btn" onclick="toggleProvider('anthropic')" id="togbtn-anthropic">Disable</button>
+      </div>
+    </div>
+
+    <div class="provider-card p-google" id="prov-google">
+      <div class="provider-header">
+        <div class="provider-icon">GEM</div>
+        <div class="provider-name">Google Gemini</div>
+        <div class="provider-status status-fallback"></div>
+      </div>
+      <select class="provider-model" id="model-google">
+        <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+        <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+        <option value="gemini-pro">gemini-pro</option>
+      </select>
+      <div class="provider-controls">
+        <span class="priority-badge p3" id="badge-google">FALLBACK 2</span>
+        <button class="toggle-btn" onclick="movePriority('google',-1)">&#8593; Up</button>
+        <button class="toggle-btn" onclick="movePriority('google',1)">&#8595; Down</button>
+        <button class="toggle-btn" onclick="toggleProvider('google')" id="togbtn-google">Disable</button>
+      </div>
+    </div>
+
+    <div class="provider-card p-mistral" id="prov-mistral">
+      <div class="provider-header">
+        <div class="provider-icon">MIS</div>
+        <div class="provider-name">Mistral</div>
+        <div class="provider-status status-off"></div>
+      </div>
+      <select class="provider-model" id="model-mistral">
+        <option value="mistral-large-latest">mistral-large</option>
+        <option value="mistral-medium-latest">mistral-medium</option>
+        <option value="mistral-small-latest">mistral-small</option>
+        <option value="open-mistral-7b">open-mistral-7b</option>
+      </select>
+      <div class="provider-controls">
+        <span class="priority-badge poff" id="badge-mistral">OFF</span>
+        <button class="toggle-btn" onclick="movePriority('mistral',-1)">&#8593; Up</button>
+        <button class="toggle-btn" onclick="movePriority('mistral',1)">&#8595; Down</button>
+        <button class="toggle-btn active-btn" onclick="toggleProvider('mistral')" id="togbtn-mistral">Enable</button>
+      </div>
+    </div>
+
+    <div class="provider-card p-cohere" id="prov-cohere">
+      <div class="provider-header">
+        <div class="provider-icon">COH</div>
+        <div class="provider-name">Cohere</div>
+        <div class="provider-status status-off"></div>
+      </div>
+      <select class="provider-model" id="model-cohere">
+        <option value="command-r-plus">command-r-plus</option>
+        <option value="command-r">command-r</option>
+        <option value="command">command</option>
+      </select>
+      <div class="provider-controls">
+        <span class="priority-badge poff" id="badge-cohere">OFF</span>
+        <button class="toggle-btn" onclick="movePriority('cohere',-1)">&#8593; Up</button>
+        <button class="toggle-btn" onclick="movePriority('cohere',1)">&#8595; Down</button>
+        <button class="toggle-btn active-btn" onclick="toggleProvider('cohere')" id="togbtn-cohere">Enable</button>
+      </div>
+    </div>
+
+    <div class="provider-card p-together" id="prov-together">
+      <div class="provider-header">
+        <div class="provider-icon">TOG</div>
+        <div class="provider-name">Together AI</div>
+        <div class="provider-status status-off"></div>
+      </div>
+      <select class="provider-model" id="model-together">
+        <option value="meta-llama/Llama-3-70b-chat-hf">Llama-3-70B</option>
+        <option value="meta-llama/Llama-3-8b-chat-hf">Llama-3-8B</option>
+        <option value="mistralai/Mixtral-8x7B-Instruct-v0.1">Mixtral-8x7B</option>
+      </select>
+      <div class="provider-controls">
+        <span class="priority-badge poff" id="badge-together">OFF</span>
+        <button class="toggle-btn" onclick="movePriority('together',-1)">&#8593; Up</button>
+        <button class="toggle-btn" onclick="movePriority('together',1)">&#8595; Down</button>
+        <button class="toggle-btn active-btn" onclick="toggleProvider('together')" id="togbtn-together">Enable</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="slabel" style="margin-top:1.5rem">Fallback router settings</div>
+  <div class="fallback-config">
+    <div class="fb-row">
+      <div class="fb-field">
+        <label>Timeout (ms)</label>
+        <input type="number" id="fb-timeout" value="8000" min="1000" max="60000" onchange="updateFlowVisual()" />
+      </div>
+      <div class="fb-field">
+        <label>Max retries</label>
+        <input type="number" id="fb-retries" value="2" min="0" max="5" onchange="updateFlowVisual()" />
+      </div>
+      <div class="fb-field">
+        <label>Retry on</label>
+        <select id="fb-retry-on">
+          <option value="all">All errors</option>
+          <option value="rate_limit">Rate limit only</option>
+          <option value="timeout">Timeout only</option>
+          <option value="5xx">5xx errors only</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-visual" id="flowVisual">
+    <div class="slabel" style="margin-bottom:0.8rem">Active fallback chain</div>
+    <div id="flowRow" class="flow-row"></div>
+    <div class="flow-label" id="flowLabel"></div>
+  </div>
+
+  <button class="gen-btn gen-btn2" onclick="generateProviderCode()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    Generate fallback router code
+  </button>
+
+  <div class="output" id="aiOutput">
+    <div class="out-header">
+      <div class="out-filename">ai_provider_router</div>
+      <div class="out-tabs">
+        <button class="out-tab active" onclick="switchOutTab('js',this)">JavaScript</button>
+        <button class="out-tab" onclick="switchOutTab('py',this)">Python</button>
+        <button class="out-tab" onclick="switchOutTab('env',this)">.env keys</button>
+      </div>
+      <button class="copy-btn" id="aiCopyBtn" onclick="copyCode('aiCode','aiCopyBtn')">Copy</button>
+    </div>
+    <pre id="aiCode"></pre>
+  </div>
+</div>
+
+<!-- FULL HUB TAB -->
+<div class="tab-content" id="tab-hub">
+  <div class="slabel">Complete integrated hub &mdash; GPU + AI providers + fallback</div>
+  <div class="config" style="margin-bottom:1.5rem">
+    <div class="row2">
+      <div class="field">
+        <label>App framework</label>
+        <select id="hub-framework">
+          <option value="express">Express.js (Node)</option>
+          <option value="fastapi">FastAPI (Python)</option>
+          <option value="flask">Flask (Python)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Deploy target</label>
+        <select id="hub-deploy">
+          <option value="replit">Replit</option>
+          <option value="railway">Railway</option>
+          <option value="render">Render</option>
+          <option value="modal">Modal.com</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>GPU backend</label>
+        <select id="hub-gpu">
+          <option value="modal">Modal.com (A100)</option>
+          <option value="runpod">RunPod Serverless</option>
+          <option value="colab">Colab + ngrok</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Auth method</label>
+        <select id="hub-auth">
+          <option value="bearer">Bearer token</option>
+          <option value="apikey">API key header</option>
+          <option value="none">None (dev mode)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="gen-btn" onclick="generateHub()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    Generate full hub server
+  </button>
+
+  <div class="output" id="hubOutput">
+    <div class="out-header">
+      <div class="out-filename" id="hubFilename">server.js</div>
+      <button class="copy-btn" id="hubCopyBtn" onclick="copyCode('hubCode','hubCopyBtn')">Copy</button>
+    </div>
+    <pre id="hubCode"></pre>
+    <div class="info-bar" id="hubInfo"></div>
+  </div>
+
+  <div class="steps-panel" id="hubSteps">
+    <div class="steps-head">Deploy steps</div>
+    <ul class="steps-list" id="hubStepsList"></ul>
+  </div>
+</div>
+
+</div>
+
+<script>
+let currentPlatform = 'modal';
+let currentOutTab = 'js';
+const providers = {
+  openai:    {enabled:true,  priority:1},
+  anthropic: {enabled:true,  priority:2},
+  google:    {enabled:true,  priority:3},
+  mistral:   {enabled:false, priority:4},
+  cohere:    {enabled:false, priority:5},
+  together:  {enabled:false, priority:6},
+};
+const providerNames = {openai:'OpenAI',anthropic:'Anthropic',google:'Google Gemini',mistral:'Mistral',cohere:'Cohere',together:'Together AI'};
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if (name==='ai') updateFlowVisual();
+}
+
+function selectPlatform(p, el) {
+  currentPlatform = p;
+  document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const g = document.getElementById('gpu');
+  if (p==='replit'||p==='colab'){g.value='T4';g.disabled=true;}else{g.disabled=false;}
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function hl(code){
+  return code.split('\n').map(line=>{
+    if(line.trim().startsWith('#')||line.trim().startsWith('//')) return '<span class="cm">'+esc(line)+'</span>';
+    let l=esc(line);
+    l=l.replace(/(["'][^"'\n]*["'])/g,s=>'<span class="str">'+s+'</span>');
+    l=l.replace(/\b(\d+\.?\d*)\b/g,s=>'<span class="num">'+s+'</span>');
+    l=l.replace(/\b(import|from|def|return|async|await|class|if|else|elif|for|in|with|as|True|False|None|const|let|var|function|try|catch|throw|new|export|require|module)\b/g,s=>'<span class="kw">'+s+'</span>');
+    l=l.replace(/(@\w+)/g,s=>'<span class="fn">'+s+'</span>');
+    return l;
+  }).join('\n');
+}
+
+function copyCode(codeId, btnId) {
+  const el=document.getElementById(codeId);
+  const text=el.dataset.raw||el.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById(btnId);
+    const orig=btn.innerText;
+    btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
+    btn.innerText='Copied!';
+    setTimeout(()=>{btn.style.borderColor='';btn.style.color='';btn.innerText=orig;},2000);
+  });
+}
+
+function generateGPU(){
+  const workload=document.getElementById('workload').value;
+  const gpu=document.getElementById('gpu').value;
+  const model=document.getElementById('modelname').value||'mistralai/Mistral-7B-v0.1';
+  const memory=document.getElementById('memory').value||'16';
+  const payload=(document.getElementById('payload').value||'Hello world').replace(/\n/g,' ');
+  const mem=parseInt(memory)*1024;
+  let code,filename,info,steps;
+
+  if(currentPlatform==='modal'){
+    filename='modal_gpu_job.py';
+    code=workload==='diffusion'?
+`import modal
+
+app = modal.App("stable-diffusion")
+image = (
+    modal.Image.debian_slim()
+    .pip_install("diffusers","torch","transformers","accelerate","Pillow")
+)
+
+@app.function(gpu="${gpu}", image=image, timeout=600)
+def generate_image(prompt: str) -> bytes:
+    from diffusers import StableDiffusionPipeline
+    import torch, io
+    pipe = StableDiffusionPipeline.from_pretrained(
+        "${model}", torch_dtype=torch.float16
+    ).to("cuda")
+    image = pipe(prompt).images[0]
+    buf = io.BytesIO()
+    image.save(buf, format="PNG")
+    return buf.getvalue()
+
+@app.function(gpu="${gpu}", image=image)
+@modal.web_endpoint(method="POST")
+def api_run(item: dict):
+    import base64
+    img_bytes = generate_image.remote(item.get("prompt","${payload}"))
+    return {"image_b64": base64.b64encode(img_bytes).decode()}` :
+`import modal
+
+app = modal.App("gpu-inference")
+image = (
+    modal.Image.debian_slim()
+    .pip_install("transformers","torch","accelerate")
+)
+
+@app.function(gpu="${gpu}", image=image, memory=${mem}, timeout=300)
+def run_inference(prompt: str) -> str:
+    from transformers import pipeline
+    import torch
+    pipe = pipeline("text-generation", model="${model}",
+        torch_dtype=torch.float16, device_map="auto")
+    return pipe(prompt, max_new_tokens=256)[0]["generated_text"]
+
+@app.function(gpu="${gpu}", image=image)
+@modal.web_endpoint(method="POST")
+def api_run(item: dict):
+    # Call from your app: fetch("https://YOUR.modal.run/api_run", {method:"POST",...})
+    return {"result": run_inference.remote(item.get("prompt","${payload}"))}
+
+if __name__ == "__main__":
+    print(run_inference.remote("${payload}"))`;
+    info=[{l:'platform',v:'Modal.com'},{l:'gpu',v:gpu},{l:'billing',v:'per-second'},{l:'deploy',v:'modal deploy modal_gpu_job.py'}];
+    steps=[
+      'Sign up at <a href="https://modal.com" target="_blank">modal.com</a> &mdash; free $30/mo credits included',
+      'Install CLI: <code>pip install modal</code> then authenticate with <code>modal token new</code>',
+      'Save generated code as <code>modal_gpu_job.py</code> and run <code>modal deploy modal_gpu_job.py</code>',
+      'Copy your live HTTPS endpoint URL and call it from Replit/Lovable frontend: <code>fetch("https://YOUR.modal.run/api_run", {method:"POST", body:JSON.stringify({prompt:"..."})})</code>',
+    ];
+  } else if(currentPlatform==='runpod'){
+    filename='handler.py';
+    code=`import runpod
+from transformers import pipeline
+import torch
+
+MODEL = None
+
+def load_model():
+    return pipeline("text-generation", model="${model}",
+        torch_dtype=torch.float16, device_map="auto")
+
+def handler(job):
+    global MODEL
+    if MODEL is None:
+        MODEL = load_model()
+    inp = job["input"]
+    prompt = inp.get("prompt","${payload}")
+    result = MODEL(prompt, max_new_tokens=inp.get("max_tokens",256))
+    return {"result": result[0]["generated_text"]}
+
+runpod.serverless.start({"handler": handler})
+
+# Dockerfile (create alongside handler.py):
+# FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel
+# RUN pip install runpod transformers accelerate
+# COPY handler.py .
+# CMD ["python", "handler.py"]
+
+# Call from JS:
+# fetch("https://api.runpod.ai/v2/YOUR_ENDPOINT/run", {
+#   method: "POST",
+#   headers: { "Authorization": "Bearer YOUR_KEY", "Content-Type": "application/json" },
+#   body: JSON.stringify({ input: { prompt: "..." } })
+# })`;
+    info=[{l:'platform',v:'RunPod Serverless'},{l:'gpu',v:gpu},{l:'billing',v:'per-worker-second'},{l:'endpoint',v:'REST POST /run'}];
+    steps=[
+      'Sign up at <a href="https://runpod.io" target="_blank">runpod.io</a> and go to Serverless section',
+      'Build Docker image: <code>docker build -t my-gpu-worker .</code>',
+      'Push image to RunPod Container Registry and attach to a new serverless endpoint',
+      'Call from any app: <code>fetch("https://api.runpod.ai/v2/ENDPOINT_ID/run", {headers:{Authorization:"Bearer KEY"}, body:JSON.stringify({input:{prompt:"..."}})})</code>',
+    ];
+  } else if(currentPlatform==='replit'){
+    filename='main.py';
+    code=`# Replit GPU Worker (Core plan required — enables T4)
+# After enabling GPU in Repl settings, run this and call /run from your frontend
+
+from flask import Flask, request, jsonify
+from transformers import pipeline
+import torch
+
+app = Flask(__name__)
+MODEL = None
+
+def load_model():
+    print(f"CUDA available: {torch.cuda.is_available()}")
+    return pipeline("text-generation", model="${model}",
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+        device_map="auto")
+
+@app.route("/run", methods=["POST"])
+def run_job():
+    global MODEL
+    if MODEL is None:
+        MODEL = load_model()
+    data = request.get_json()
+    prompt = data.get("prompt","${payload}")
+    result = MODEL(prompt, max_new_tokens=data.get("max_tokens",256))
+    return jsonify({"result": result[0]["generated_text"]})
+
+@app.route("/health")
+def health():
+    return jsonify({"status":"ok","cuda":torch.cuda.is_available()})
+
+if __name__ == "__main__":
+    # Frontend calls: fetch("/run", { method:"POST", body:JSON.stringify({prompt:"..."}) })
+    app.run(host="0.0.0.0", port=5000)`;
+    info=[{l:'platform',v:'Replit GPU'},{l:'gpu',v:'NVIDIA T4'},{l:'plan',v:'Core (paid)'},{l:'endpoint',v:'localhost:5000/run'}];
+    steps=[
+      'Upgrade Replit project to <strong>Core</strong> plan (includes T4 GPU)',
+      'In Repl settings &rarr; enable GPU add-on',
+      'Paste generated code as <code>main.py</code> and click Run',
+      'Your Replit frontend calls: <code>fetch("/run", {method:"POST", body:JSON.stringify({prompt:"..."})})</code>',
+    ];
+  } else {
+    filename='colab_cells.py';
+    code=`# CELL 1 — Install dependencies + check GPU
+!pip install flask pyngrok transformers torch accelerate -q
+import torch
+print(f"GPU: {torch.cuda.get_device_name(0)}")
+print(f"VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
+
+# CELL 2 — Start Flask + ngrok tunnel
+from flask import Flask, request, jsonify
+from pyngrok import ngrok
+from transformers import pipeline
+import torch, threading
+
+app = Flask(__name__)
+MODEL = None
+
+def load_model():
+    return pipeline("text-generation", model="${model}",
+        torch_dtype=torch.float16, device_map="auto")
+
+@app.route("/run", methods=["POST"])
+def run_job():
+    global MODEL
+    if MODEL is None:
+        MODEL = load_model()
+    data = request.get_json()
+    prompt = data.get("prompt","${payload}")
+    result = MODEL(prompt, max_new_tokens=256)
+    return jsonify({"result": result[0]["generated_text"]})
+
+# Get free token at ngrok.com/signup
+ngrok.set_auth_token("YOUR_NGROK_TOKEN")
+public_url = ngrok.connect(5000)
+print(f"Your GPU endpoint: {public_url}/run")
+print(f"Paste this URL into your app as GPU_ENDPOINT_URL")
+
+threading.Thread(target=lambda: app.run(port=5000)).start()`;
+    info=[{l:'platform',v:'Google Colab'},{l:'gpu',v:'T4 (free)'},{l:'note',v:'tab must stay open'},{l:'type',v:'ngrok tunnel'}];
+    steps=[
+      'Open <a href="https://colab.new" target="_blank">colab.new</a> &rarr; Runtime &rarr; Change runtime type &rarr; T4 GPU &rarr; Save',
+      'Paste each cell block into separate notebook cells',
+      'Get free ngrok auth token at <a href="https://ngrok.com" target="_blank">ngrok.com</a> and replace <code>YOUR_NGROK_TOKEN</code>',
+      'Run all cells &mdash; your public URL prints in output. Paste it into your frontend as the GPU endpoint.',
+      '<strong>Note:</strong> Colab tab must stay open. For persistent always-on GPU use Modal or RunPod instead.',
+    ];
+  }
+
+  document.getElementById('gpuFilename').textContent=filename;
+  const pre=document.getElementById('gpuCode');
+  pre.innerHTML=hl(code);pre.dataset.raw=code;
+  document.getElementById('gpuInfo').innerHTML=info.map(i=>`<div class="info-item">${i.l}: <span>${i.v}</span></div>`).join('');
+  document.getElementById('gpuStepsList').innerHTML=steps.map(s=>`<li>${s}</li>`).join('');
+  document.getElementById('gpuOutput').classList.add('show');
+  document.getElementById('gpuSteps').classList.add('show');
+  document.getElementById('gpuOutput').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function toggleProvider(id){
+  providers[id].enabled=!providers[id].enabled;
+  const btn=document.getElementById('togbtn-'+id);
+  btn.textContent=providers[id].enabled?'Disable':'Enable';
+  btn.classList.toggle('active-btn',!providers[id].enabled);
+  updateAllBadges();updateFlowVisual();
+}
+
+function movePriority(id,dir){
+  const cur=providers[id].priority;
+  const newP=cur+dir;
+  if(newP<1||newP>6)return;
+  const other=Object.keys(providers).find(k=>providers[k].priority===newP);
+  if(other)providers[other].priority=cur;
+  providers[id].priority=newP;
+  updateAllBadges();updateFlowVisual();
+}
+
+function updateAllBadges(){
+  const enabled=Object.keys(providers).filter(k=>providers[k].enabled).sort((a,b)=>providers[a].priority-providers[b].priority);
+  const cls=['p1','p2','p3','p3','p3','p3'];
+  const lbl=['PRIMARY','FALLBACK 1','FALLBACK 2','FALLBACK 3','FALLBACK 4','FALLBACK 5'];
+  Object.keys(providers).forEach(id=>{
+    const badge=document.getElementById('badge-'+id);
+    const dot=document.querySelector('#prov-'+id+' .provider-status');
+    if(!providers[id].enabled){
+      badge.className='priority-badge poff';badge.textContent='OFF';
+      dot.className='provider-status status-off';
+    } else {
+      const idx=enabled.indexOf(id);
+      badge.className='priority-badge '+cls[idx];badge.textContent=lbl[idx];
+      dot.className='provider-status '+(idx===0?'status-active':'status-fallback');
+    }
+  });
+}
+
+function updateFlowVisual(){
+  const enabled=Object.keys(providers).filter(k=>providers[k].enabled).sort((a,b)=>providers[a].priority-providers[b].priority);
+  const fc=['primary','fb1','fb2','fb3','fb3','fb3'];
+  const row=document.getElementById('flowRow');
+  if(!row)return;
+  if(enabled.length===0){row.innerHTML='<span style="color:var(--muted);font-size:0.78rem">No providers enabled</span>';return;}
+  let html='';
+  enabled.forEach((id,i)=>{
+    const m=(document.getElementById('model-'+id)||{}).value||'';
+    const shortModel=m.split('/').pop();
+    if(i>0)html+='<span class="flow-arrow">&rarr; fail &rarr;</span>';
+    html+=`<div class="flow-node ${fc[i]}">${providerNames[id]}<span style="opacity:0.55;font-size:0.62rem;margin-left:4px">${shortModel}</span></div>`;
+  });
+  row.innerHTML=html;
+  const timeout=(document.getElementById('fb-timeout')||{}).value||8000;
+  const retries=(document.getElementById('fb-retries')||{}).value||2;
+  document.getElementById('flowLabel').textContent=`timeout: ${timeout}ms  |  max retries: ${retries}  |  ${enabled.length} provider${enabled.length>1?'s':''} in chain`;
+}
+
+function switchOutTab(tab, btn){
+  currentOutTab=tab;
+  document.querySelectorAll('.out-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  if(document.getElementById('aiOutput').classList.contains('show')) generateProviderCode();
+}
+
+function generateProviderCode(){
+  const enabled=Object.keys(providers).filter(k=>providers[k].enabled).sort((a,b)=>providers[a].priority-providers[b].priority);
+  const timeout=(document.getElementById('fb-timeout')||{}).value||8000;
+  const retries=(document.getElementById('fb-retries')||{}).value||2;
+  const retryOn=(document.getElementById('fb-retry-on')||{}).value||'all';
+  const mf=id=>(document.getElementById('model-'+id)||{}).value||'';
+  const keyNames={openai:'OPENAI_API_KEY',anthropic:'ANTHROPIC_API_KEY',google:'GOOGLE_API_KEY',mistral:'MISTRAL_API_KEY',cohere:'COHERE_API_KEY',together:'TOGETHER_API_KEY'};
+  let code='';
+
+  if(currentOutTab==='env'){
+    code=enabled.map(id=>`${keyNames[id]}=your_${id}_key_here`).join('\n');
+    code+='\n\n# GPU backends\nMODAL_TOKEN_ID=your_modal_token_id\nMODAL_TOKEN_SECRET=your_modal_secret\nRUNPOD_API_KEY=your_runpod_key\nRUNPOD_ENDPOINT_ID=your_endpoint_id\nCOLAB_NGROK_URL=https://xxxx.ngrok.io\nHUB_SECRET=your_hub_bearer_token';
+  } else if(currentOutTab==='js'){
+    const provConfigs=enabled.map(id=>{
+      const m=mf(id);
+      if(id==='openai')    return `  { name:"openai",    model:"${m}", url:"https://api.openai.com/v1/chat/completions",           key:process.env.OPENAI_API_KEY }`;
+      if(id==='anthropic') return `  { name:"anthropic", model:"${m}", url:"https://api.anthropic.com/v1/messages",                key:process.env.ANTHROPIC_API_KEY, version:"2023-06-01" }`;
+      if(id==='google')    return `  { name:"google",    model:"${m}", url:"https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent", key:process.env.GOOGLE_API_KEY }`;
+      if(id==='mistral')   return `  { name:"mistral",   model:"${m}", url:"https://api.mistral.ai/v1/chat/completions",          key:process.env.MISTRAL_API_KEY }`;
+      if(id==='cohere')    return `  { name:"cohere",    model:"${m}", url:"https://api.cohere.ai/v1/generate",                  key:process.env.COHERE_API_KEY }`;
+      if(id==='together')  return `  { name:"together",  model:"${m}", url:"https://api.together.xyz/v1/chat/completions",       key:process.env.TOGETHER_API_KEY }`;
+    }).join(',\n');
+    code=`// AI Provider Fallback Router — JavaScript
+// Paste into your Express/Node backend or Replit server
+
+const PROVIDERS = [
+${provConfigs}
+];
+const TIMEOUT_MS = ${timeout};
+const MAX_RETRIES = ${retries};
+const RETRY_ON = "${retryOn}"; // all | rate_limit | timeout | 5xx
+
+async function callProvider(p, prompt) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  try {
+    let url = p.url, headers = { "Content-Type":"application/json" }, body;
+    if (p.name === "anthropic") {
+      headers["x-api-key"] = p.key;
+      headers["anthropic-version"] = p.version;
+      body = { model:p.model, max_tokens:1024, messages:[{role:"user",content:prompt}] };
+    } else if (p.name === "google") {
+      url = p.url + "?key=" + p.key;
+      body = { contents:[{parts:[{text:prompt}]}] };
+    } else if (p.name === "cohere") {
+      headers["Authorization"] = "Bearer " + p.key;
+      body = { model:p.model, prompt, max_tokens:256 };
+    } else {
+      headers["Authorization"] = "Bearer " + p.key;
+      body = { model:p.model, messages:[{role:"user",content:prompt}], max_tokens:1024 };
+    }
+    const res = await fetch(url, {method:"POST", signal:ctrl.signal, headers, body:JSON.stringify(body)});
+    clearTimeout(timer);
+    if (!res.ok) throw {status:res.status, providerName:p.name};
+    const data = await res.json();
+    if (p.name==="anthropic") return data.content[0].text;
+    if (p.name==="google")    return data.candidates[0].content.parts[0].text;
+    if (p.name==="cohere")    return data.generations[0].text;
+    return data.choices[0].message.content;
+  } catch(err) { clearTimeout(timer); throw err; }
+}
+
+function shouldRetry(err) {
+  if (RETRY_ON==="all") return true;
+  if (RETRY_ON==="rate_limit" && err.status===429) return true;
+  if (RETRY_ON==="timeout" && err.name==="AbortError") return true;
+  if (RETRY_ON==="5xx" && err.status>=500) return true;
+  return false;
+}
+
+// Main entry — call from your route handlers
+async function chat(prompt) {
+  const errors = [];
+  for (const p of PROVIDERS) {
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const result = await callProvider(p, prompt);
+        console.log("[AI Router] success:", p.name, "attempt", attempt+1);
+        return { result, provider:p.name, attempt:attempt+1 };
+      } catch(err) {
+        const msg = p.name+" attempt "+(attempt+1)+": "+(err.status||err.message);
+        console.warn("[AI Router]", msg);
+        errors.push(msg);
+        if (!shouldRetry(err) || attempt===MAX_RETRIES) break;
+        await new Promise(r=>setTimeout(r, 500*(attempt+1)));
+      }
+    }
+  }
+  throw new Error("All providers failed:\\n"+errors.join("\\n"));
+}
+
+module.exports = { chat };`;
+  } else {
+    const provList=enabled.map(id=>{
+      const m=mf(id);
+      const k=keyNames[id];
+      return `    {"name":"${id}","model":"${m}","key_env":"${k}"}`;
+    }).join(',\n');
+    code=`# AI Provider Fallback Router — Python
+# pip install openai anthropic google-generativeai cohere httpx
+
+import os, time, httpx
+PROVIDERS = [
+${provList}
+]
+TIMEOUT = ${timeout/1000}
+MAX_RETRIES = ${retries}
+
+def call_openai(model, prompt, key):
+    from openai import OpenAI
+    c = OpenAI(api_key=key)
+    r = c.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], max_tokens=1024)
+    return r.choices[0].message.content
+
+def call_anthropic(model, prompt, key):
+    import anthropic
+    c = anthropic.Anthropic(api_key=key)
+    r = c.messages.create(model=model, max_tokens=1024, messages=[{"role":"user","content":prompt}])
+    return r.content[0].text
+
+def call_google(model, prompt, key):
+    import google.generativeai as genai
+    genai.configure(api_key=key)
+    return genai.GenerativeModel(model).generate_content(prompt).text
+
+def call_mistral(model, prompt, key):
+    r = httpx.post("https://api.mistral.ai/v1/chat/completions",
+        headers={"Authorization":f"Bearer {key}"},
+        json={"model":model,"messages":[{"role":"user","content":prompt}]}, timeout=TIMEOUT)
+    r.raise_for_status()
+    return r.json()["choices"][0]["message"]["content"]
+
+def call_cohere(model, prompt, key):
+    import cohere
+    return cohere.Client(key).generate(model=model,prompt=prompt,max_tokens=256).generations[0].text
+
+def call_together(model, prompt, key):
+    r = httpx.post("https://api.together.xyz/v1/chat/completions",
+        headers={"Authorization":f"Bearer {key}"},
+        json={"model":model,"messages":[{"role":"user","content":prompt}]}, timeout=TIMEOUT)
+    r.raise_for_status()
+    return r.json()["choices"][0]["message"]["content"]
+
+CALLERS = {"openai":call_openai,"anthropic":call_anthropic,"google":call_google,
+           "mistral":call_mistral,"cohere":call_cohere,"together":call_together}
+
+def chat(prompt: str) -> dict:
+    errors = []
+    for p in PROVIDERS:
+        key = os.environ.get(p["key_env"])
+        if not key:
+            errors.append(f"{p['name']}: no API key ({p['key_env']})")
+            continue
+        for attempt in range(MAX_RETRIES + 1):
+            try:
+                result = CALLERS[p["name"]](p["model"], prompt, key)
+                print(f"[AI Router] success: {p['name']} attempt {attempt+1}")
+                return {"result":result,"provider":p["name"],"attempt":attempt+1}
+            except Exception as e:
+                msg = f"{p['name']} attempt {attempt+1}: {e}"
+                print(f"[AI Router] {msg}")
+                errors.append(msg)
+                if attempt < MAX_RETRIES:
+                    time.sleep(0.5*(attempt+1))
+    raise RuntimeError("All providers failed:\\n"+"\\n".join(errors))`;
+  }
+
+  const pre=document.getElementById('aiCode');
+  pre.innerHTML=hl(code);pre.dataset.raw=code;
+  document.getElementById('aiOutput').classList.add('show');
+  document.getElementById('aiOutput').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function generateHub(){
+  const framework=document.getElementById('hub-framework').value;
+  const deploy=document.getElementById('hub-deploy').value;
+  const gpuBackend=document.getElementById('hub-gpu').value;
+  const auth=document.getElementById('hub-auth').value;
+  let code,filename,info,steps;
+
+  const gpuFn = gpuBackend==='modal'?
+`async function callGPU(prompt) {
+  const res = await fetch(process.env.GPU_ENDPOINT_URL, {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({prompt})
+  });
+  if (!res.ok) throw new Error("GPU error: "+res.status);
+  return res.json();
+}` : gpuBackend==='runpod'?
+`async function callGPU(prompt) {
+  const res = await fetch("https://api.runpod.ai/v2/"+process.env.RUNPOD_ENDPOINT_ID+"/run", {
+    method:"POST",
+    headers:{"Authorization":"Bearer "+process.env.RUNPOD_API_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({input:{prompt}})
+  });
+  if (!res.ok) throw new Error("RunPod error: "+res.status);
+  return res.json();
+}` :
+`async function callGPU(prompt) {
+  // Colab + ngrok — set COLAB_NGROK_URL in .env
+  const res = await fetch(process.env.COLAB_NGROK_URL+"/run", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({prompt})
+  });
+  if (!res.ok) throw new Error("Colab GPU error: "+res.status);
+  return res.json();
+}`;
+
+  const authMw = auth==='bearer'?
+`function requireAuth(req, res, next) {
+  const token = (req.headers.authorization||"").split(" ")[1];
+  if (!token || token !== process.env.HUB_SECRET) return res.status(401).json({error:"Unauthorized"});
+  next();
+}` : auth==='apikey'?
+`function requireAuth(req, res, next) {
+  const key = req.headers["x-api-key"];
+  if (!key || key !== process.env.HUB_SECRET) return res.status(401).json({error:"Unauthorized"});
+  next();
+}` : `const requireAuth = (req, res, next) => next(); // dev mode`;
+
+  filename='server.js';
+  code=`// HeavenFace GPU + AI Hub
+// Framework: Express.js | GPU backend: ${gpuBackend} | Deploy: ${deploy}
+// npm install express cors dotenv
+// Requires ai_provider_router.js (generate it in the AI Providers tab)
+
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const { chat } = require("./ai_provider_router");
+
+${authMw}
+
+${gpuFn}
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// POST /api/chat — AI providers with auto-fallback
+app.post("/api/chat", requireAuth, async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) return res.status(400).json({error:"prompt required"});
+    const result = await chat(prompt);
+    res.json({success:true, ...result});
+  } catch(e) { res.status(503).json({success:false, error:e.message}); }
+});
+
+// POST /api/gpu — direct GPU inference
+app.post("/api/gpu", requireAuth, async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) return res.status(400).json({error:"prompt required"});
+    const result = await callGPU(prompt);
+    res.json({success:true, result});
+  } catch(e) { res.status(502).json({success:false, error:e.message}); }
+});
+
+// POST /api/hybrid — try GPU first, fall back to AI providers automatically
+app.post("/api/hybrid", requireAuth, async (req, res) => {
+  const { prompt, prefer } = req.body;
+  if (!prompt) return res.status(400).json({error:"prompt required"});
+  if (prefer === "gpu") {
+    try {
+      const result = await callGPU(prompt);
+      return res.json({success:true, mode:"gpu", result});
+    } catch(_) {
+      console.warn("[Hub] GPU failed, falling back to AI providers");
+    }
+  }
+  try {
+    const result = await chat(prompt);
+    res.json({success:true, mode:"ai", ...result});
+  } catch(e) { res.status(503).json({success:false, error:e.message}); }
+});
+
+// GET /health
+app.get("/health", (req, res) => {
+  res.json({status:"ok", gpu:"${gpuBackend}", deploy:"${deploy}", auth:"${auth}"});
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("[Hub] Running on port "+PORT));
+
+// ─── Frontend usage ───────────────────────────────────────────────────────────
+// AI chat with fallback:
+//   fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"},
+//     body:JSON.stringify({prompt:"your prompt"})})
+//
+// GPU inference:
+//   fetch("/api/gpu", {method:"POST", ...same...})
+//
+// Hybrid (GPU first, AI fallback):
+//   fetch("/api/hybrid", {method:"POST", body:JSON.stringify({prompt:"...", prefer:"gpu"})})`;
+
+  info=[{l:'framework',v:'Express.js'},{l:'gpu',v:gpuBackend},{l:'auth',v:auth},{l:'deploy',v:deploy}];
+  steps=[
+    'Run <code>npm install express cors dotenv</code>',
+    'Generate your AI router code from the <strong>AI Providers</strong> tab and save as <code>ai_provider_router.js</code>',
+    'Create <code>.env</code> with your API keys (use the .env keys subtab in AI Providers)',
+    deploy==='replit'?'Replit: set <code>server.js</code> as the run command. Add env vars in Secrets panel.':
+    deploy==='railway'?'Railway: connect GitHub repo at <a href="https://railway.app" target="_blank">railway.app</a>. Add env vars in dashboard.':
+    deploy==='render'?'Render: connect repo at <a href="https://render.com" target="_blank">render.com</a>. Set env vars in service settings.':
+    'Modal: <code>modal deploy server.js</code>',
+    'Call <code>POST /api/hybrid</code> from your HeavenFace frontend &mdash; GPU first, AI providers as fallback',
+  ];
+
+  document.getElementById('hubFilename').textContent=filename;
+  const pre=document.getElementById('hubCode');
+  pre.innerHTML=hl(code);pre.dataset.raw=code;
+  document.getElementById('hubInfo').innerHTML=info.map(i=>`<div class="info-item">${i.l}: <span>${i.v}</span></div>`).join('');
+  document.getElementById('hubStepsList').innerHTML=steps.map(s=>`<li>${s}</li>`).join('');
+  document.getElementById('hubOutput').classList.add('show');
+  document.getElementById('hubSteps').classList.add('show');
+  document.getElementById('hubOutput').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+updateFlowVisual();
+</script>
+</body>
+</html>

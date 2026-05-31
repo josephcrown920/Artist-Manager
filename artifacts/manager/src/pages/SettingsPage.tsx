@@ -1,6 +1,32 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Save, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink } from "lucide-react";
+import { Save, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink, FlaskConical } from "lucide-react";
+
+function CapiTestButton() {
+  const [state, setState] = useState<"idle" | "loading" | "ok" | "err">("idle");
+  const [msg, setMsg] = useState("");
+  const run = async () => {
+    setState("loading");
+    try {
+      const r = await fetch("/api/spotify-capi/test", { method: "POST" });
+      const d = await r.json();
+      if (!r.ok) { setState("err"); setMsg(d.error || "Failed"); }
+      else { setState("ok"); setMsg(d.message || "Test event sent ✓"); }
+    } catch { setState("err"); setMsg("Network error"); }
+    setTimeout(() => setState("idle"), 4000);
+  };
+  return (
+    <div className="space-y-1.5">
+      <button onClick={run} disabled={state === "loading"}
+        className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg font-medium transition-all disabled:opacity-50"
+        style={{ background: "hsl(142 71% 45% / 0.12)", border: "1px solid hsl(142 71% 45% / 0.35)", color: "hsl(142 71% 60%)" }}>
+        {state === "loading" ? <Loader2 size={12} className="animate-spin" /> : <FlaskConical size={12} />}
+        Send Test Event
+      </button>
+      {msg && <div className="text-[11px]" style={{ color: state === "ok" ? "hsl(142 71% 55%)" : "hsl(0 72% 60%)" }}>{msg}</div>}
+    </div>
+  );
+}
 
 interface Settings {
   artistName?: string; genre?: string;
@@ -15,6 +41,9 @@ interface Settings {
   audiomackArtistUrl?: string;
   boomplayArtistUrl?: string;
   shopifyStoreUrl?: string; shopifyApiKey?: string;
+  spotifyCapiToken?: string; spotifyCapiConnectionId?: string;
+  youtubeChannelId?: string; youtubeApiKey?: string;
+  tiktokShopId?: string;
   metaPixelId?: string; tiktokPixelId?: string; googleAnalyticsId?: string;
   [key: string]: any;
 }
@@ -192,6 +221,24 @@ export default function SettingsPage() {
         link="https://admin.shopify.com" linkText="Shopify Admin">
         <TextInput label="Store URL" value={form.shopifyStoreUrl || ""} onChange={set("shopifyStoreUrl")} placeholder="https://your-store.myshopify.com" />
         <SecretInput label="Shopify API Key" value={form.shopifyApiKey || ""} onChange={set("shopifyApiKey")} />
+      </PlatformSection>
+
+      <PlatformSection emoji="🟢" title="Spotify Conversions API (CAPI)" subtitle="Server-to-server conversion tracking for Spotify Ads"
+        link="https://ads.spotify.com" linkText="Spotify Ads Manager">
+        <SecretInput label="CAPI Token" value={form.spotifyCapiToken || ""} onChange={set("spotifyCapiToken")} placeholder="Bearer token from Spotify Ads Manager" />
+        <TextInput label="Connection ID" value={form.spotifyCapiConnectionId || ""} onChange={set("spotifyCapiConnectionId")} placeholder="Your CAPI Connection ID" />
+        <CapiTestButton />
+      </PlatformSection>
+
+      <PlatformSection emoji="▶️" title="YouTube Channel" subtitle="YouTube Studio & Data API"
+        link="https://studio.youtube.com" linkText="YouTube Studio">
+        <TextInput label="Channel ID" value={form.youtubeChannelId || ""} onChange={set("youtubeChannelId")} placeholder="UCxxxxxxxxxxxxxxxxx" />
+        <SecretInput label="YouTube Data API Key" value={form.youtubeApiKey || ""} onChange={set("youtubeApiKey")} placeholder="AIza..." />
+      </PlatformSection>
+
+      <PlatformSection emoji="🛍️" title="TikTok Shop" subtitle="TikTok Shop seller account"
+        link="https://seller.tiktok.com" linkText="TikTok Seller Center">
+        <TextInput label="TikTok Shop ID" value={form.tiktokShopId || ""} onChange={set("tiktokShopId")} placeholder="Your shop ID" />
       </PlatformSection>
 
       <PlatformSection emoji="📊" title="Tracking Pixels & Analytics" subtitle="Measure conversions across platforms">

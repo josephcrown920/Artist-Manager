@@ -1,0 +1,177 @@
+Spotify Conversions API
+This feature is currently in beta.
+ 
+This article covers how to connect to Spotify’s Conversions API
+ 
+Table of Contents
+About Spotify’s Conversions API
+Onboarding Summary
+Integration Methods
+Google Tag Manager Integration
+Direct Integration
+Connect to the Conversions API in Ads Manager
+Creating a Google Tag Manager Integration
+Creating a Direct Server-to-Server Integration
+Using the API
+Troubleshooting the Conversions API
+ 
+About Spotify’s Conversions API
+
+
+What is Spotify’s Conversions API?
+Spotify’s Conversions API is a tagless attribution tool that enables you to directly pass online and offline conversion events to Spotify. The Conversions API is designed to provide comprehensive, high-fidelity attribution to help you understand the performance of your campaigns on Spotify. 
+ 
+Once created, the Conversions API connection should be selected as the conversion measurement data source during the Ads Manager campaign booking process.
+ 
+Using the Spotify’s Conversions API with Ads Manager, you can:
+Install the Conversions API, one time, to measure all of your campaigns on Spotify. 
+See the key cross-device actions listeners take on your website, app, or offline
+Better understand the ROI of your investment across Ads Manager.
+ 
+What can the Conversions API measure?
+The Conversions API supports the following events from your website, app, or offline:
+Add to Cart
+Alias
+Lead
+Page View
+Purchase
+Sign Up
+Start Checkout
+View Product
+Custom Event (up to 5)
+ 
+Onboarding Summary
+
+
+The Spotify Conversions API (CAPI) enables advertisers to send web, app, and offline events through a server-to-server integration. Like the Spotify Pixel, this integration allows you to track and measure campaign attribution for your Spotify campaigns by passing these events to Spotify.
+
+ 
+Integration Methods
+
+
+Google Tag Manager Integration
+Advertisers using Google Tag Manager (GTM) can use our GTM template for a faster, more lightweight integration option that does not require development work. 
+
+Before setting up a GTM integration, please ensure that you have billing account access and project creator permissions within your GCP organization in order to do automatic provisioning. If you plan to do manual provisioning instead of automatic, you will need help from a user with the appropriate GCP permissions to set up the Cloud Run infrastructure following Google’s documentation.
+
+Direct Integration
+To maximize control over your integration process, we recommend creating a direct integration with the Conversions API. This will require developer involvement.
+
+ 
+
+Connect to the Conversions API in Ads Manager
+
+Login to Ads Manager and navigate to Events from the global navigation icon in the top left corner
+Once on this page, you can navigate to Connect data source and select Conversions API
+ 
+Next, name your Conversions API
+If you also plan to use the Spotify Pixel, it is recommended to create a dataset in order to enable deduplicated conversion measurement using both Spotify Pixel and Conversions API data.
+Using the search bar, choose the Ad Account(s) to connect to your Conversions API. The desired Ad Account(s) must be associated with your Business account.
+ 
+On the “View Conversions API Instructions” read the “Access Conversions API” section then navigate to the Token section
+Click “Generate token”
+Generate your authentication token (you can generate up to 3 tokens)
+ 
+Copy your token and Connection ID
+You can only send events for Connection ID that belong to the org that generated the token. 
+ 
+Creating a Google Tag Manager Integration
+
+
+To create a Google Tag Manager integration, you will need an authentication token and connection ID generated from the Events page in Spotify Ads Manager. You must be a Business Admin in Ads Manager to access the dashboard and follow the steps below.
+Before setting up a GTM integration, please ensure that you have billing account access and project creator permissions within your GCP organization in order to do automatic provisioning. If you plan to do manual provisioning instead of automatic, you will need help from a user with the appropriate GCP permissions to set up the Cloud Run infrastructure following Google’s documentation.
+
+Follow the instructions in the section above to connect to the Conversions API in Ads Manager
+Go to Google Tag Manager and create a new Server container
+Click on “Tags” from the left sidebar and select New
+Click “Tag Configuration” and select “Discover more tag types in the Community Template Gallery” from the Choose Tag Type window
+Search for “Spotify” and select “Spotify CAPI 3P Integration Tag” > Add to workspace
+Paste in your authentication token and connection ID from Events Manager
+Configure events, action source, and select triggers
+Click “Save” to deploy the tag
+ 
+You can also access the Conversions API Google Tag Manager tag template directly here: https://tagmanager.google.com/gallery/#/owners/spotify/templates/conversion-api-tag-template
+ 
+The public repository for the GTM tag template can also be found here: https://github.com/spotify/conversion-api-tag-template 
+ 
+ 
+Creating a Direct Server-to-Server Integration
+
+
+To create a direct server-to-server integration and access the Conversions API, you will need an authentication token and connection ID generated from the Events page in Spotify Ads Manager. You must be a Business Admin in Ads Manager to access the dashboard and follow the steps below.
+ 
+
+Authentication
+Spotify supports a long lived token. You will be able to generate up to 3 tokens at a time. After your third token is created you will need to delete a previous token to generate a new one. Your token will not expire and can be used indefinitely. 
+ 
+Connection ID
+In order to access the API you’ll need to have your Connection ID. The Connection ID is a unique key assigned to your organization that allows you to access the API when used with the token. The connection ID can be found in Ads Manager under “View Conversions API Instructions.”
+ 
+User Data
+The Conversions API currently accepts four (4) identifier types: IP address, device ID, hashed email address, and hashed phone number. At least one type of identifier must be passed. As a best practice, include both IP and device ID when possible.
+ 
+Using the API
+
+ 
+Endpoint
+Resource URL: https://capi.spotify.com/capi-direct/events/
+
+ConversionService
+Resource URL: https://capi.spotify.com/capi-direct/events/
+Request
+Method: POST
+Description: This method submits conversion events, enabling the tracking of user interactions such as purchases, checkouts, and other types of engagement through the specified direct API endpoint.
+Visit Spotify for Developers to learn more about sending requests to the API. 
+ 
+Event Definitions
+Event Type Name 
+Description 
+Page View 
+optional
+The act of landing on or viewing a specific page on a website. For example, landing on the website’s homepage or browsing a specific product page. Note that the page view event is required for all advertisers to track if they opt to utilize the Spotify Pixel. 
+Lead 
+optional
+The submission of information about a person or company that has expressed some form of interest in a product or service. For example, submitting an email address to sign up for a newsletter. Note that lead can mean different things depending on the advertiser and industry.
+Add to Cart
+optional
+The action of adding an item to a virtual shopping cart or basket. For example, clicking an Add to Cart button on a website, but not actually completing the purchase transaction.
+Purchase
+optional
+The completion of an online purchase transaction, usually signified by receiving order or purchase confirmation, or a transaction receipt. For example, landing on a Thank You or Order Confirmation page.
+View Product 
+optional
+Measures the action of someone viewing a webpage dedicated to a specific product. 
+
+Best practices: 
+The View Product event code must be installed on every product page that the advertiser is looking to measure.
+To get more granular insight on specific product names, it’s recommended to use the product_name parameter to pass the name of the page or product associated with the product view event. 
+Sign Up
+optional
+Measures the action of signing up or registering for an event, product, service, etc. 
+Start Checkout 
+optional
+Measures when a user has initiated the online checkout process.
+Alias
+optional
+Sends the advertiser’s customer details to Spotify (email, phone number).
+Custom Event
+optional
+Measures bespoke or custom event actions on a website that are not available as one of Spotify’s standard event types. These are events that you define yourself.
+
+While in beta, custom events cannot be renamed. They will appear in the reporting as Custom Event 1, Custom Event 2, etc., so it’s important to document which custom events map to specific actions on your website when conducting the initial setup. 
+
+Note: Ads Manager currently supports up to 5 custom events. 
+
+
+Troubleshooting the Conversions API
+
+
+You've implemented the Conversions API and it’s been at least 20 minutes but you’re still not seeing activity in the Event activity graph in Ads Manager. What do you do now?
+ 
+Troubleshooting Tips
+Ensure that you have correctly entered your token and connection ID.
+Confirm that the Conversions API has been selected as the conversion measurement data source for your campaign.
+If using Google Tag Manager, ensure that you have set up a server container, not a web container.
+If using the direct server-to-server integration, ensure your API call is formatted correctly.
+ 
+If you're still not seeing any event activity, check in with your engineering team on how the Conversions API was configured and which events are being shared.

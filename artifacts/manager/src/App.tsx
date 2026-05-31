@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState } from "react";
 import {
   LayoutDashboard, Bot, CheckSquare, Zap, Settings, BookOpen, Menu, X,
-  Megaphone, TrendingUp, ListMusic, Sparkles, Youtube,
+  Megaphone, TrendingUp, ListMusic, Sparkles, Youtube, Users, ShoppingBag,
 } from "lucide-react";
 import Dashboard from "@/pages/Dashboard";
 import Agents from "@/pages/Agents";
@@ -17,6 +17,9 @@ import KnowledgeBase from "@/pages/KnowledgeBase";
 import GrowthPlaybooks from "@/pages/GrowthPlaybooks";
 import PlaylistPitches from "@/pages/PlaylistPitches";
 import YouTubeGrowth from "@/pages/YouTubeGrowth";
+import CreatorCollab from "@/pages/CreatorCollab";
+import ShopTok from "@/pages/ShopTok";
+import YouTubeStudio from "@/pages/YouTubeStudio";
 import NotFound from "@/pages/not-found";
 import ChatbotWidget from "@/components/ChatbotWidget";
 
@@ -31,6 +34,9 @@ const NAV = [
   { path: "/ads", label: "Ad Campaigns", icon: Megaphone },
   { path: "/growth-playbooks", label: "Growth Playbooks", icon: TrendingUp },
   { path: "/youtube", label: "Shorts Growth", icon: Youtube },
+  { path: "/youtube-studio", label: "YT Studio", icon: Youtube },
+  { path: "/creator", label: "Creator Collab", icon: Users },
+  { path: "/shoptok", label: "ShopTok", icon: ShoppingBag },
   { path: "/tasks", label: "Tasks", icon: CheckSquare },
   { path: "/engagement", label: "Engagement", icon: Zap },
   { path: "/knowledge", label: "Knowledge Base", icon: BookOpen },
@@ -186,6 +192,9 @@ function Router() {
         <Route path="/ads" component={AdCampaigns} />
         <Route path="/growth-playbooks" component={GrowthPlaybooks} />
         <Route path="/youtube" component={YouTubeGrowth} />
+        <Route path="/youtube-studio" component={YouTubeStudio} />
+        <Route path="/creator" component={CreatorCollab} />
+        <Route path="/shoptok" component={ShopTok} />
         <Route path="/tasks" component={Tasks} />
         <Route path="/engagement" component={Engagement} />
         <Route path="/knowledge" component={KnowledgeBase} />
