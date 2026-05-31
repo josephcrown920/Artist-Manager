@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState } from "react";
 import {
   LayoutDashboard, Bot, CheckSquare, Zap, Settings, BookOpen, Menu, X,
-  Megaphone, TrendingUp, ListMusic, Sparkles, Youtube, Users, ShoppingBag,
+  Megaphone, TrendingUp, ListMusic, Sparkles, Youtube, Users, ShoppingBag, Clapperboard,
 } from "lucide-react";
 import Dashboard from "@/pages/Dashboard";
 import Agents from "@/pages/Agents";
@@ -18,6 +18,7 @@ import GrowthPlaybooks from "@/pages/GrowthPlaybooks";
 import PlaylistPitches from "@/pages/PlaylistPitches";
 import YouTubeGrowth from "@/pages/YouTubeGrowth";
 import CreatorCollab from "@/pages/CreatorCollab";
+import CreatorFactory from "@/pages/CreatorFactory";
 import ShopTok from "@/pages/ShopTok";
 import YouTubeStudio from "@/pages/YouTubeStudio";
 import NotFound from "@/pages/not-found";
@@ -35,6 +36,7 @@ const NAV = [
   { path: "/growth-playbooks", label: "Growth Playbooks", icon: TrendingUp },
   { path: "/youtube", label: "Shorts Growth", icon: Youtube },
   { path: "/youtube-studio", label: "YT Studio", icon: Youtube },
+  { path: "/creator-factory", label: "Creator Factory", icon: Clapperboard },
   { path: "/creator", label: "Creator Collab", icon: Users },
   { path: "/shoptok", label: "ShopTok", icon: ShoppingBag },
   { path: "/tasks", label: "Tasks", icon: CheckSquare },
@@ -193,6 +195,7 @@ function Router() {
         <Route path="/growth-playbooks" component={GrowthPlaybooks} />
         <Route path="/youtube" component={YouTubeGrowth} />
         <Route path="/youtube-studio" component={YouTubeStudio} />
+        <Route path="/creator-factory" component={CreatorFactory} />
         <Route path="/creator" component={CreatorCollab} />
         <Route path="/shoptok" component={ShopTok} />
         <Route path="/tasks" component={Tasks} />
