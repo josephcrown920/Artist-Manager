@@ -1,3 +1,4 @@
+import AIModelSettings from "@/components/AIModelSettings";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Save, Eye, EyeOff, CheckCircle2, Loader2, ExternalLink, FlaskConical } from "lucide-react";
@@ -137,6 +138,8 @@ export default function SettingsPage() {
         </p>
         <div className="rule mt-4" />
       </div>
+
+      <AIModelSettings />
 
       <PlatformSection emoji="🎤" title="Artist Profile" subtitle="Your core identity">
         <TextInput label="Artist Name" value={form.artistName || ""} onChange={set("artistName")} placeholder="NBA Josh" />

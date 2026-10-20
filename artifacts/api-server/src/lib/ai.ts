@@ -1,10 +1,12 @@
 import { db, appSettingsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "./logger.js";
+import { AI_PROVIDERS, type AIProvider } from "./ai-config.js";
+import { callOllama } from "./ollama.js";
+export type { AIProvider } from "./ai-config.js";
 
 export type AIMessage = { role: "user" | "assistant" | "system"; content: string };
 
-export type AIProvider = "anthropic" | "inference" | "xai" | "gemini" | "openrouter";
 
 const ANTHROPIC_DEFAULT_MODEL  = "claude-3-5-sonnet-latest";
 const XAI_DEFAULT_MODEL        = "grok-3-mini";
@@ -29,7 +31,7 @@ async function getSetting(key: string): Promise<string | null> {
  * Pick provider in this priority:
  * 1. Explicit `ai_provider` setting in DB
  * 2. First provider whose API key is present:
- *    anthropic → gemini → openrouter → xai → inference
+ *    ollama → anthropic → xai → openrouter → gemini → inference
  * 3. Throws — no provider available
  */
 async function resolveProvider(): Promise<AIProvider> {
@@ -39,17 +41,19 @@ async function resolveProvider(): Promise<AIProvider> {
     explicit === "gemini" ||
     explicit === "openrouter" ||
     explicit === "xai" ||
-    explicit === "inference"
+    explicit === "inference" ||
+    explicit === "ollama"
   ) {
     return explicit as AIProvider;
   }
+  if (process.env.OLLAMA_API_KEY)       return "ollama";
   if (process.env.ANTHROPIC_API_KEY)    return "anthropic";
   if (process.env.XAI_API_KEY)          return "xai";
   if (process.env.OPENROUTER_API_KEY)   return "openrouter";
   if (process.env.GEMINI_API_KEY)       return "gemini";
   if (process.env.INFERENCE_SH_API_KEY) return "inference";
   throw new Error(
-    "No AI provider configured. Add ANTHROPIC_API_KEY, GEMINI_API_KEY, OPENROUTER_API_KEY, or XAI_API_KEY to secrets.",
+    "No AI provider configured. Add OLLAMA_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, OPENROUTER_API_KEY, or XAI_API_KEY to secrets.",
   );
 }
 
@@ -271,12 +275,19 @@ export async function callAI(
   const provider = await resolveProvider();
 
   const dispatch = async (p: AIProvider) => {
+    if (p === "ollama") {
+      const model = (await getSetting("ollama_model")) || AI_PROVIDERS.ollama.defaultModel;
+      return callOllama(model, messages, systemPrompt, opts);
+    }
     if (p === "anthropic")  return callAnthropic(messages, systemPrompt, opts);
     if (p === "gemini")     return callGemini(messages, systemPrompt, opts);
     if (p === "openrouter") return callOpenRouter(messages, systemPrompt, opts);
     if (p === "xai")        return callXAI(messages, systemPrompt, opts);
     return callInference(messages, systemPrompt, opts);
   };
+
+  // An explicit Ollama selection must not consume another provider's credits.
+  if (provider === "ollama") return dispatch(provider);
 
   try {
     return await dispatch(provider);

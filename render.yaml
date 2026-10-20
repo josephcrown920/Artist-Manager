@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: artist-manager
+    runtime: node
+    plan: free
+    buildCommand: bash deployment/build.sh
+    startCommand: node deployment/server.mjs
+    healthCheckPath: /api/healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false

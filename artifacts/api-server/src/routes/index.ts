@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import aiSettingsRouter from "./ai-settings.js";
 import healthRouter from "./health";
 import chatRouter from "./chat";
 import agentsRouter from "./agents";
@@ -17,6 +18,7 @@ import videoGenRouter from "./video-gen";
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use("/ai-settings", aiSettingsRouter);
 router.use("/chat", chatRouter);
 router.use("/agents", agentsRouter);
 router.use("/tasks", tasksRouter);
